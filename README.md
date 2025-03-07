@@ -60,28 +60,31 @@ pip install -r requirements.txt
 ```
 /SwiftShare
 │
-├── /android/SwiftShare
-│
 ├── /android
-│   ├── /Bluetooth
-│   │   ├── BluetoothActivity.java
-│   │   ├── BluetoothFileSender.java
-│   │   └── BluetoothFileReceiver.java
-│   ├── /Lan
-│   │   ├── FileClient.java
-│   │   ├── FileServer.java
-│   ├── /Ui
-│   │   ├── MainActivity.java
-│   │   ├── FileSelectionActivity.java
-│   │   └── SettingsActivity.java
-│   ├── /res
-│   │   ├── /layout
-│   │   ├── /drawable
-│   │   ├── /values
-│   │   │   └── strings.xml
-│   ├── AndroidManifest.xml
 │
-├── /desktop
+├── /Bluetooth          
+│   ├── BluetoothActivity.java
+│   ├── BluetoothFileSender.java
+│   └── BluetoothFileReceiver.java
+│
+├── /Lan            
+│   ├── FileClient.java
+│   └── FileServer.java
+│
+├── /Ui     
+│   ├── MainActivity.java
+│   ├── FileSelectionActivity.java
+│   └── SettingsActivity.java
+│
+├── /res
+│   ├── /layout
+│   ├── /drawable
+│   ├── /values
+│   │   └── strings.xml
+│
+└── AndroidManifest.xml
+│
+├── /desktop (JAVAFX)
 │   ├── /bluetooth
 │   │   ├── BluetoothDiscovery.java
 │   │   ├── BluetoothConnector.java
