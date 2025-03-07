@@ -1,5 +1,7 @@
 # **SwiftShare Development Guidelines**
 
+**Since this is going to be a development with more than 3 people involved, it is best to have a proper convention throughout the project.**
+
 ## **Naming Conventions**
 
 ### **General Guidelines**
