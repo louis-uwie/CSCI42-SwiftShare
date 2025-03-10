@@ -2,6 +2,18 @@
 
 **Since this is going to be a development with more than 3 people involved, it is best to have a proper convention throughout the project.**
 
+## **IMPORTANT**
+- When opening the project directory use this process:
+   - PULL the repository
+   - OPEN the specific directory via the IDE. 
+   > For example, to open the ANDROID version of the application:
+      - PULL changes in repository.
+      - OPEN Android Studio
+      - via Android Studio, OPEN project directory ./main_android/
+      - This will open the project working directory. Make changes here
+      - **Commit and Push as needed.**
+      / This is because there will be two projects in this repository. Runnable at different platforms.
+
 ### **Naming Convention**
 - **Consistency** is key: Use meaningful, descriptive names for files, variables, methods, and classes.
 - **CamelCase** should be used for method and variable names (e.g., `getUserData()`, `fileTransferStatus`).
