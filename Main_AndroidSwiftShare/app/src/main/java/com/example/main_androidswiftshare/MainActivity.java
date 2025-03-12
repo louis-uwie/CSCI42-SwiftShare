@@ -10,20 +10,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 public class MainActivity extends AppCompatActivity {
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_main);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
-    }
-
-    /**
-     * TODO: ITERATION 01 - INITIAL PLACEHOLDER FEATURES (NEAR-FUNCTIONAL) - DEADLINE: MARCH 14, 2025
+    /** TODO: ITERATION 01 - INITIAL PLACEHOLDER FEATURES (NEAR-FUNCTIONAL) - DEADLINE: MARCH 14, 2025
      * 1.)  REQUEST user to allow LOCAL file access. Written already as manifest uses-permissions.
      *      Need to actually make a POP-UP request with yes/no response.
      * 2.)  INITIAL button features.
@@ -38,6 +25,17 @@ public class MainActivity extends AppCompatActivity {
      *                              IF USER picked NO, retry. Go back to home.
      *                              IF USER did NOT allow local file permissions. Request.
      *                              ELSE: Go to File Explorer / Receive Class.
-     *
      */
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_main);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
+    }
 }
