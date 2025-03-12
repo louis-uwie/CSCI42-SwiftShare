@@ -5,9 +5,17 @@
     <!-- This 'uses-permission' is to allow this app to access local files-->
     <!-- Need more permissions? Find feature here: https://developer.android.com/reference/android/provider/Settings#ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION -->
 
+    <!-- LOCAL FILE ACCESS -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
+
+    <!-- BLUETOOTH -->
+    <!-- For more references: https://developer.android.com/develop/connectivity/bluetooth/bt-permissions -->
+    <uses-permission android:name="android.permission.BLUETOOTH"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT"/>
+
 
     <!-- Will probably not use these yet. -->
     <!-- <uses-permission android:name="android.permission.READ_MEDIA_VIDEO"/>-->
