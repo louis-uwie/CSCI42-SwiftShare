@@ -32,7 +32,11 @@ android {
 }
 
 dependencies {
+//  Added Dependencies as of March 12, 2025 | 1:55PM
+    implementation("androidx.bluetooth:bluetooth:1.0.0-alpha02") //BLUETOOTH API - https://developer.android.com/jetpack/androidx/releases/bluetooth#kts
 
+
+//  Default Dependencies!
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
