@@ -21,4 +21,23 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
     }
+
+    /**
+     * TODO: ITERATION 01 - INITIAL PLACEHOLDER FEATURES (NEAR-FUNCTIONAL) - DEADLINE: MARCH 14, 2025
+     * 1.)  REQUEST user to allow LOCAL file access. Written already as manifest uses-permissions.
+     *      Need to actually make a POP-UP request with yes/no response.
+     * 2.)  INITIAL button features.
+     *      - Projected Features:
+     *          openFileBTN         IF USER did NOT allow local file permissions. Request.
+     *                              ELSE: Continue to file explorer.
+     *          --
+     *          sendFileBTN         IF USER did NOT allow local file permissions. Request.
+     *                              ELSE: Go to file explorer view (to pick where to send)
+     *          --
+     *          receiveFileBTN      REQUEST bluetooth-usage "Allow this app to access bluetooth?" Y/N
+     *                              IF USER picked NO, retry. Go back to home.
+     *                              IF USER did NOT allow local file permissions. Request.
+     *                              ELSE: Go to File Explorer / Receive Class.
+     *
+     */
 }
