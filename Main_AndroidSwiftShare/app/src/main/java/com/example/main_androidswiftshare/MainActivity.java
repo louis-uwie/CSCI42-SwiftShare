@@ -15,6 +15,7 @@ public class MainActivity extends AppCompatActivity {
      *      Need to actually make a POP-UP request with yes/no response.
      * 2.)  INITIAL button features.
      *      - Projected Features:
+     *          --
      *          openFileBTN         IF USER did NOT allow local file permissions. Request.
      *                              ELSE: Continue to file explorer.
      *          --
