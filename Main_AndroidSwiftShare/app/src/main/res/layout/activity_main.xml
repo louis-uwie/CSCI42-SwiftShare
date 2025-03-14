@@ -18,9 +18,24 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.285" />
 
+    <!--File Locator Button-->
+    <Button
+        android:id="@+id/filelocatorBTN"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
+        android:text="File Locator"
+        app:layout_constraintBottom_toTopOf="@+id/sendBTN"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/placeholderTV"
+        app:layout_constraintVertical_bias="0.971" />
+
+    <!--Send Button-->
     <Button
         android:id="@+id/sendBTN"
-        android:layout_width="wrap_content"
+        android:layout_width="150dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="4dp"
         android:text="Send"
@@ -31,9 +46,10 @@
         app:layout_constraintTop_toBottomOf="@+id/placeholderTV"
         app:layout_constraintVertical_bias="0.971" />
 
+    <!--Receive Button-->
     <Button
         android:id="@+id/receiveBTN"
-        android:layout_width="wrap_content"
+        android:layout_width="150dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="80dp"
         android:backgroundTintMode="src_in"
