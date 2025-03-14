@@ -3,6 +3,7 @@ package com.example.main_androidswiftshare;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.widget.Button;
@@ -16,7 +17,11 @@ import androidx.core.content.ContextCompat;
 public class MainActivity extends AppCompatActivity {
 
     private Button btnSend, btnReceive, btnFileLocator;
-    private static final int STORAGE_PERMISSION_CODE = 101;
+    private static final int STORAGE_PERMISSION_CODE = 101; // Photo/Video
+
+    private static final int FILE_PICKER_REQUEST_CODE = 102; // Local File
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,8 +36,7 @@ public class MainActivity extends AppCompatActivity {
 
         btnFileLocator.setOnClickListener(v -> {
             if (hasStoragePermission()) {
-                Intent intent = new Intent(MainActivity.this, FileLocator.class);
-                startActivity(intent);
+                openFilePicker();
                 finish();
             } else {
                 requestStoragePermission();
@@ -102,4 +106,34 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
+    private void openFilePicker() {
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.setType("*/*");  // All file types
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        startActivityForResult(Intent.createChooser(intent, "Select a File"), FILE_PICKER_REQUEST_CODE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == FILE_PICKER_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
+            Uri fileUri = data.getData();
+
+            if (fileUri != null) {
+                Toast.makeText(this, "File selected: " + fileUri.getPath(), Toast.LENGTH_SHORT).show();
+
+                // Launch FileLocator Activity after selecting the file
+                Intent intent = new Intent(MainActivity.this, FileLocator.class);
+                intent.putExtra("selected_file_uri", fileUri.toString());
+                startActivity(intent);
+                finish(); // Close MainActivity if needed
+            } else {
+                Toast.makeText(this, "No file selected.", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+
 }
