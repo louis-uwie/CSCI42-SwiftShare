@@ -4,7 +4,7 @@ This repository hosts the code for the **CSCI 42 Project Deliverable**: a cross-
 ## **CSCI 42 - SwiftShare - Introduction to Software Engineering**
 
 ### **Authors:**
-- Bautista, Ronald Francis D. [placeholder](https://github.com)
+- Bautista, Ronald Francis D. [franch1se](https://github.com/franch1se)
 - Binwag, Louis G. III - [louis-uwie](https://github.com/louis-uwie)
 - Cacacho, Jean Maximus C. [jeanmaxcacacho](https://github.com/jeanmaxcacacho)
 - Magtipon, Ciana Louisse G. - [cianamagtipon](https://github.com/cianamagtipon)
