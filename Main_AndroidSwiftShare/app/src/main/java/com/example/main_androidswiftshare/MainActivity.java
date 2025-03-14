@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -27,6 +28,7 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
     private Button btnSend, btnReceive, btnFileLocator;
+    private ImageButton btnExit;
     private static final int STORAGE_PERMISSION_CODE = 101;
     private static final int FILE_PICKER_REQUEST_CODE = 102;
     private static final int REQUEST_ENABLE_BT = 1;
@@ -67,6 +69,7 @@ public class MainActivity extends AppCompatActivity {
         btnSend = findViewById(R.id.sendBTN);
         btnReceive = findViewById(R.id.receiveBTN);
         btnFileLocator = findViewById(R.id.filelocatorBTN);
+        btnExit = findViewById(R.id.exitButton);
 
         checkPermissionOnStartup();
 
@@ -104,6 +107,16 @@ public class MainActivity extends AppCompatActivity {
                 // Always prompt again on button click
                 requestBluetoothPermissions();
             }
+        });
+
+        btnExit.setOnClickListener(v -> {
+            bluetoothSubmenu.setVisibility(View.GONE);
+            stopBluetoothDiscovery();
+        });
+
+        closeSubmenu.setOnClickListener(v -> {
+            bluetoothSubmenu.setVisibility(View.GONE);
+            stopBluetoothDiscovery();
         });
 
 
