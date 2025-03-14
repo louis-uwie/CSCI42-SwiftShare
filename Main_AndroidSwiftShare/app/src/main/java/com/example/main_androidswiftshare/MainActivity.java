@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
 
         btnReceive.setOnClickListener(v -> Toast.makeText(this, "Receive feature coming soon.", Toast.LENGTH_LONG).show());
 
-        Button listDevicesButton = findViewById(R.id.listDevices);
+        Button listDevicesButton = findViewById(R.id.listdevicesBTN);
         bluetoothSubmenu = findViewById(R.id.bluetoothSubmenu);
         Button closeSubmenu = findViewById(R.id.closeSubmenu);
         bluetoothDeviceList = findViewById(R.id.bluetoothDeviceList);
