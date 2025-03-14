@@ -8,7 +8,10 @@
     <!-- LOCAL FILE ACCESS -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO"/>
+    <uses-permission android:name="android. permission. READ_MEDIA_AUDIO"/>
 
     <!-- BLUETOOTH -->
     <!-- For more references: https://developer.android.com/develop/connectivity/bluetooth/bt-permissions -->
@@ -18,10 +21,6 @@
 
     <uses-feature android:name="android.hardware.bluetooth" android:required="true"/>
 
-
-    <!-- Will probably not use these yet. -->
-    <!-- <uses-permission android:name="android.permission.READ_MEDIA_VIDEO"/>-->
-    <!-- <uses-permission android:name="android. permission. READ_MEDIA_AUDIO"/>-->
 
     <application
         android:allowBackup="true"
