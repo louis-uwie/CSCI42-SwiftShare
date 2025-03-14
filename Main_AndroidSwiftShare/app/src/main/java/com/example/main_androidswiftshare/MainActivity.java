@@ -49,6 +49,8 @@ public class MainActivity extends AppCompatActivity {
              *  If Allowed: Go to DeviceLocator
              *  Send File Soon.
              */
+
+            Toast.makeText(this, "Send Button Clicked! This Feature is coming soon, Apologies for the wait.", Toast.LENGTH_LONG).show();
         });
 
         btnReceive.setOnClickListener(v -> {
@@ -59,6 +61,8 @@ public class MainActivity extends AppCompatActivity {
              *  -
              *  Suggestion: Have a dedicated ~/SwiftShare directory?
              */
+
+            Toast.makeText(this, "Receive Button Clicked! This Feature is coming soon, Apologies for the wait.", Toast.LENGTH_LONG).show();
 
 
         });
