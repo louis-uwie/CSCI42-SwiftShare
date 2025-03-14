@@ -101,9 +101,11 @@ public class MainActivity extends AppCompatActivity {
                 bluetoothSubmenu.setVisibility(View.VISIBLE);
                 startBluetoothDiscovery();
             } else {
+                // Always prompt again on button click
                 requestBluetoothPermissions();
             }
         });
+
 
 
 
@@ -155,17 +157,12 @@ public class MainActivity extends AppCompatActivity {
 
     private void requestBluetoothPermissions() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.BLUETOOTH_SCAN) ||
-                    ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.BLUETOOTH_CONNECT)) {
-
-                Toast.makeText(this, "Bluetooth permissions required. Please grant them.", Toast.LENGTH_LONG).show();
-            }
-
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT},
                     REQUEST_PERMISSION_BT);
         }
     }
+
 
     private void checkBluetoothPermissionsAndScan() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
@@ -210,14 +207,7 @@ public class MainActivity extends AppCompatActivity {
                 bluetoothSubmenu.setVisibility(View.VISIBLE);
                 startBluetoothDiscovery();
             } else {
-                if (!ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.BLUETOOTH_SCAN) ||
-                        !ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.BLUETOOTH_CONNECT)) {
-                    // User has permanently denied permission
-                    Toast.makeText(this, "Bluetooth permissions permanently denied. Enable manually in app settings. Under 'Nearby devices'", Toast.LENGTH_LONG).show();
-                    openAppSettings();
-                } else {
-                    Toast.makeText(this, "Bluetooth permissions denied. Try again.", Toast.LENGTH_SHORT).show();
-                }
+                Toast.makeText(this, "Bluetooth permissions denied. Tap again to retry.", Toast.LENGTH_SHORT).show();
             }
         } else if (requestCode == STORAGE_PERMISSION_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -227,6 +217,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
 
 
 
