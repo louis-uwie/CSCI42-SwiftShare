@@ -44,6 +44,9 @@
             
         </activity>
 
-    </application>
+        <activity
+            android:name=".FileLocator"
+            android:exported="true"/>
+        </application>
 
 </manifest>
