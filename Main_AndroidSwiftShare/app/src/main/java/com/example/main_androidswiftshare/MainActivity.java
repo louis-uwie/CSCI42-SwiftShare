@@ -26,7 +26,6 @@ import androidx.core.content.ContextCompat;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-
     private Button btnSend, btnReceive, btnFileLocator;
     private static final int STORAGE_PERMISSION_CODE = 101;
     private static final int FILE_PICKER_REQUEST_CODE = 102;
@@ -98,9 +97,15 @@ public class MainActivity extends AppCompatActivity {
         }
 
         listDevicesButton.setOnClickListener(v -> {
-            bluetoothSubmenu.setVisibility(View.VISIBLE);
-            checkBluetoothPermissionsAndScan();
+            if (hasBluetoothPermissions()) {
+                bluetoothSubmenu.setVisibility(View.VISIBLE);
+                startBluetoothDiscovery();
+            } else {
+                requestBluetoothPermissions();
+            }
         });
+
+
 
         findViewById(R.id.closeSubmenu).setOnClickListener(v -> {
             bluetoothSubmenu.setVisibility(View.GONE);
@@ -139,6 +144,29 @@ public class MainActivity extends AppCompatActivity {
     /**
      * BLUETOOTH PERMISSION ACCESS CHECKING
      */
+
+    private boolean hasBluetoothPermissions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            return ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED &&
+                    ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED;
+        }
+        return true; // Permissions auto-granted below Android 12
+    }
+
+    private void requestBluetoothPermissions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.BLUETOOTH_SCAN) ||
+                    ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.BLUETOOTH_CONNECT)) {
+
+                Toast.makeText(this, "Bluetooth permissions required. Please grant them.", Toast.LENGTH_LONG).show();
+            }
+
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT},
+                    REQUEST_PERMISSION_BT);
+        }
+    }
+
     private void checkBluetoothPermissionsAndScan() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT}, REQUEST_PERMISSION_BT);
@@ -177,11 +205,19 @@ public class MainActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         if (requestCode == REQUEST_PERMISSION_BT) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "Bluetooth permissions granted. Starting discovery.", Toast.LENGTH_SHORT).show();
+            if (hasBluetoothPermissions()) {
+                Toast.makeText(this, "Bluetooth permissions granted.", Toast.LENGTH_SHORT).show();
+                bluetoothSubmenu.setVisibility(View.VISIBLE);
                 startBluetoothDiscovery();
             } else {
-                Toast.makeText(this, "Bluetooth permissions denied. Unable to start discovery.", Toast.LENGTH_LONG).show();
+                if (!ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.BLUETOOTH_SCAN) ||
+                        !ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.BLUETOOTH_CONNECT)) {
+                    // User has permanently denied permission
+                    Toast.makeText(this, "Bluetooth permissions permanently denied. Enable manually in app settings. Under 'Nearby devices'", Toast.LENGTH_LONG).show();
+                    openAppSettings();
+                } else {
+                    Toast.makeText(this, "Bluetooth permissions denied. Try again.", Toast.LENGTH_SHORT).show();
+                }
             }
         } else if (requestCode == STORAGE_PERMISSION_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -191,6 +227,8 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
+
 
 
     private void stopBluetoothDiscovery() {
@@ -209,6 +247,15 @@ public class MainActivity extends AppCompatActivity {
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         startActivityForResult(Intent.createChooser(intent, "Select a File"), FILE_PICKER_REQUEST_CODE);
     }
+
+    // Directly open app settings to modify bluetooth permissions. This is normal in other apps as well so I think its appropriate.
+    private void openAppSettings() {
+        Intent intent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        Uri uri = Uri.fromParts("package", getPackageName(), null);
+        intent.setData(uri);
+        startActivity(intent);
+    }
+
 
     // Stopping Bluetooth.
     @Override
