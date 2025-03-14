@@ -7,9 +7,8 @@ import javafx.geometry.Pos;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
 
-public class MainController {
+public class SendScreenController {
 
     double w = 1024;
     double h = 768;
@@ -22,8 +21,6 @@ public class MainController {
     GridPane gridPane;
     @FXML
     VBox centerVBox;
-    @FXML
-    Text appDescription;
 
     @FXML
     public void initialize() {
@@ -35,19 +32,12 @@ public class MainController {
         gridPane.setAlignment(Pos.CENTER);
  
         centerVBox.setPrefWidth(w/2);
-        appDescription.setWrappingWidth(w/2);
-        appDescription.setText("SwiftShare is a cross-platform offline file transfer application designed to enable seamless file sharing between Windows, macOS, Linux, Android, and iOS devices.");
  
     }
     
     @FXML
-    private void SendButton() throws IOException {
-        App.setRoot("sendScreen");
-    }
-
-    @FXML
-    private void ReceiveButton() throws IOException {
-        App.setRoot("recieveScreen");
+    private void Next() throws IOException {
+        App.setRoot("home");
     }
 
     @FXML

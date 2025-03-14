@@ -19,8 +19,8 @@
             <VBox fx:id="centerVBox" alignment="CENTER" spacing="20" xmlns:fx="http://javafx.com/fxml/1" GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
                <Label text="Welcome to SwiftShare!" HBox.hgrow="ALWAYS" />
                <Text fx:id="appDescription" text="hello" HBox.hgrow="ALWAYS" />
-               <Button fx:id="button1" text="Button 1" onAction="#Button1" HBox.hgrow="ALWAYS"/>
-               <Button fx:id="button2" text="Button 2" onAction="#Button2" HBox.hgrow="ALWAYS"/>
+               <Button fx:id="sendButton" text="Send" onAction="#SendButton" HBox.hgrow="ALWAYS"/>
+               <Button fx:id="receiveButton" text="Receive" onAction="#ReceiveButton" HBox.hgrow="ALWAYS"/>
             </VBox>
          </children>
       </GridPane>
