@@ -10,6 +10,7 @@ android {
     defaultConfig {
         applicationId = "com.finals.kotlin_androidswiftshare"
         minSdk = 24
+        maxSdk = 32
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
