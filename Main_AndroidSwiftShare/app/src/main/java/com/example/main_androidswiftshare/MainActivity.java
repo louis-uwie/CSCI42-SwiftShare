@@ -19,6 +19,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -99,7 +100,9 @@ public class MainActivity extends AppCompatActivity {
         listDevicesButton.setOnClickListener(v -> {
             if (hasBluetoothPermissions()) {
                 bluetoothSubmenu.setVisibility(View.VISIBLE);
-                startBluetoothDiscovery();
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    startBluetoothDiscovery();
+                }
             } else {
                 // Always prompt again on button click
                 requestBluetoothPermissions();
@@ -164,14 +167,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    @RequiresApi(api = Build.VERSION_CODES.S)
     private void checkBluetoothPermissionsAndScan() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT}, REQUEST_PERMISSION_BT);
         } else {
             startBluetoothDiscovery();
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.S)
     private void startBluetoothDiscovery() {
         if (!bluetoothAdapter.isEnabled()) {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
@@ -205,7 +210,9 @@ public class MainActivity extends AppCompatActivity {
             if (hasBluetoothPermissions()) {
                 Toast.makeText(this, "Bluetooth permissions granted.", Toast.LENGTH_SHORT).show();
                 bluetoothSubmenu.setVisibility(View.VISIBLE);
-                startBluetoothDiscovery();
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    startBluetoothDiscovery();
+                }
             } else {
                 Toast.makeText(this, "Bluetooth permissions denied. Tap again to retry.", Toast.LENGTH_SHORT).show();
             }
