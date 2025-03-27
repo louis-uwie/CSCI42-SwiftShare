@@ -1,6 +1,7 @@
 package com.finals.kotlin_androidswiftshare
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -15,6 +16,8 @@ import androidx.core.view.WindowInsetsCompat
 
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var bluetoothManager: BluetoothManager // INITIALIZING BluetoothManager.class INTO MainAactivity
+
     private val requestPermissionsLauncher =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
             permissions.entries.forEach {
@@ -28,6 +31,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -42,6 +46,7 @@ class MainActivity : AppCompatActivity() {
         requestStoragePermissions()
 
         val fileLocatorButton = findViewById<Button>(R.id.LocateFileBTN)
+        val startDiscoveryButton = findViewById<Button>(R.id.deviceDiscovery)
 
         fileLocatorButton.setOnClickListener{
             //TODO: Open File Locator
@@ -49,11 +54,29 @@ class MainActivity : AppCompatActivity() {
             openFileLocator()
         }
 
+        startDiscoveryButton.setOnClickListener {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                requestBluetoothLauncher.launch(bluetoothPermissions)
+            } else {
+                try {
+                    bluetoothManager.startDiscovery()
+                } catch (e: SecurityException) {
+                    e.printStackTrace()
+                    Toast.makeText(this, "Missing Bluetooth permission", Toast.LENGTH_SHORT).show()
+                }
+
+            }
+        }
+
+
 
 
 
     }
 
+    /**
+     * LOCAL FILE ACCESS IS HERE
+     */
     private fun requestStoragePermissions() {
         val permissionsToRequest = mutableListOf<String>()
 
@@ -85,6 +108,25 @@ class MainActivity : AppCompatActivity() {
 
     private fun openFileLocator(){
 
+    }
+
+    /**
+     * BLUETOOTH REQUEST PERMISSIONS ARE HERE
+     */
+    val bluetoothPermissions = arrayOf(
+        Manifest.permission.BLUETOOTH_SCAN,
+        Manifest.permission.BLUETOOTH_CONNECT
+    )
+
+    val requestBluetoothLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        val granted = permissions.values.all { it }
+        if (granted) {
+            bluetoothManager.startDiscovery()
+        } else {
+            Toast.makeText(this, "Bluetooth permissions denied", Toast.LENGTH_SHORT).show()
+        }
     }
 
 }
