@@ -110,24 +110,23 @@ class BluetoothManager(private val context: Context) {
  * This section provides example snippets of how to integrate BluetoothManager into an
  * Android Activity or ViewModel.
  *
- * // Initialize BluetoothManager inside an Activity or ViewModel
+ * -- Initialize BluetoothManager inside an Activity or ViewModel
  * val bluetoothManager = BluetoothManager(this)
  *
- * // Start scanning for Bluetooth devices when a button is clicked
+ * -- Start scanning for Bluetooth devices when a button is clicked
  * bluetoothManager.startDiscovery()
  *
- * // Stop scanning when needed
+ *  Stop scanning when needed
  * bluetoothManager.stopDiscovery()
  *
- * // Make the device discoverable for 2 minutes
+ * -- Make the device discoverable for 2 minutes
  * bluetoothManager.makeDeviceDiscoverable(120)
  *
- * // Pair with a selected device (assuming you have a reference to a BluetoothDevice)
+ * -- Pair with a selected device (assuming you have a reference to a BluetoothDevice)
  * val selectedDevice: BluetoothDevice = discoveredDevices[0] // Example selection
  * bluetoothManager.pairDevice(selectedDevice)
  *
- * // Clean up resources when done (e.g., in onDestroy of an Activity)
+ * -- Clean up resources when done (e.g., in onDestroy of an Activity)
  * bluetoothManager.cleanup()
- *
  * =====================================================================================
  */
