@@ -9,7 +9,6 @@ import android.os.Environment
 import android.os.Handler
 import android.os.Looper
 import android.widget.Button
-import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -28,7 +27,6 @@ class FileSender : AppCompatActivity() {
 
     private lateinit var fileRecyclerView: RecyclerView // RECYCLER VIEW TO DISPLAY LOCAL FILES
     private lateinit var previewTextView: TextView // TEXT PREVIEW FOR SELECTED FILE
-    private lateinit var bluetoothDeviceRecyclerView: RecyclerView // RECYCLER VIEW TO DISPLAY BLUETOOTH DEVICES
     private lateinit var bluetoothManager: BluetoothManager // BLUETOOTH MANAGER INSTANCE
     private val fileList = mutableListOf<File>() // LIST OF FILES TO DISPLAY
     private val bluetoothDevices = mutableListOf<BluetoothDevice>() // LIST OF DEVICES TO SEND TO
@@ -156,47 +154,41 @@ class FileSender : AppCompatActivity() {
         // INITIALIZE UI COMPONENTS
         fileRecyclerView = findViewById(R.id.fileRecyclerView)
         previewTextView = findViewById(R.id.filePreview)
-//        bluetoothDeviceRecyclerView = findViewById(R.id.bluetoothDeviceRecyclerView)
+        val bluetoothSendFileButton = findViewById<Button>(R.id.SendFileBTN)
 
         // SETUP FILE RECYCLERVIEW
         fileRecyclerView.layoutManager = LinearLayoutManager(this)
         val fileAdapter = FileAdapter(fileList) { selectedFile ->
             previewTextView.text = "Preview: ${selectedFile.name}"
         }
-
-        val bluetoothSendFileButton = findViewById<Button>(R.id.SendFileBTN)
-
-        bluetoothManager = BluetoothManager(this)
-
-        bluetoothSendFileButton.setOnClickListener {
-            bluetoothDevices.clear()
-            bluetoothManager.startDiscovery()
-            Toast.makeText(this, "Finding Bluetooth devices...", Toast.LENGTH_SHORT).show()
-
-            // Show dialog after a short delay
-            Handler(Looper.getMainLooper()).postDelayed({
-                showBluetoothDevicesPopup()
-            }, 3000)
-        }
-
-
-
-//        fileRecyclerView.adapter = fileAdapter
-
-        // SETUP BLUETOOTH DEVICE RECYCLERVIEW
-//        bluetoothDeviceRecyclerView.layoutManager = LinearLayoutManager(this)
-//        val deviceAdapter = BluetoothDeviceAdapter(bluetoothDevices)
-//        bluetoothDeviceRecyclerView.adapter = deviceAdapter
+        fileRecyclerView.adapter = fileAdapter
 
         // INITIALIZE BLUETOOTH MANAGER
-//        bluetoothManager = BluetoothManager(this)
-//        bluetoothManager.onDeviceDiscovered = { device ->
-//            runOnUiThread {
-//                bluetoothDevices.add(device)
-//                deviceAdapter.notifyItemInserted(bluetoothDevices.size - 1)
-//            }
-//        }
+        bluetoothManager = BluetoothManager(this)
 
-        requestFilePermissions() // Call File Access / Permission Request
+        // SET CALLBACKS BEFORE STARTING DISCOVERY
+        bluetoothManager.onDeviceDiscovered = { device ->
+            runOnUiThread {
+                if (!bluetoothDevices.contains(device)) {
+                    bluetoothDevices.add(device)
+                }
+            }
+        }
+
+        bluetoothManager.onDiscoveryFinished = {
+            runOnUiThread {
+                showBluetoothDevicesPopup()
+            }
+        }
+
+        // HANDLE BLUETOOTH SEND BUTTON CLICK
+        bluetoothSendFileButton.setOnClickListener {
+            bluetoothDevices.clear()
+            startBluetoothDiscovery()
+        }
+
+        // REQUEST FILE PERMISSIONS ON LAUNCH
+        requestFilePermissions()
     }
+
 }

@@ -1,8 +1,10 @@
 package com.finals.kotlin_androidswiftshare
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.bluetooth.*
+import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothDevice
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -11,14 +13,14 @@ import android.content.pm.PackageManager
 import android.util.Log
 import androidx.activity.result.ActivityResultLauncher
 import androidx.core.app.ActivityCompat
-import android.Manifest
-
 
 class BluetoothManager(private val context: Context) {
+
     private val bluetoothAdapter: BluetoothAdapter? = BluetoothAdapter.getDefaultAdapter()
     private val discoveredDevices = mutableListOf<BluetoothDevice>()
 
     var onDeviceDiscovered: ((BluetoothDevice) -> Unit)? = null
+    var onDiscoveryFinished: (() -> Unit)? = null
 
     /**
      * BroadcastReceiver to handle Bluetooth discovery events.
@@ -29,6 +31,7 @@ class BluetoothManager(private val context: Context) {
         @SuppressLint("MissingPermission")
         override fun onReceive(context: Context?, intent: Intent?) {
             when (intent?.action) {
+
                 /**
                  * Triggered when a Bluetooth device is found.
                  * Extracts the device from the intent and adds it to discoveredDevices if not already present.
@@ -39,17 +42,18 @@ class BluetoothManager(private val context: Context) {
                         if (!discoveredDevices.contains(it)) {
                             discoveredDevices.add(it)
                             Log.d("BluetoothManager", "Discovered: ${it.name} - ${it.address}")
-
                             onDeviceDiscovered?.invoke(it)
                         }
                     }
                 }
+
                 /**
                  * Triggered when the discovery process is finished.
                  * Logs that the discovery is complete.
                  */
                 BluetoothAdapter.ACTION_DISCOVERY_FINISHED -> {
                     Log.d("BluetoothManager", "Discovery finished")
+                    onDiscoveryFinished?.invoke()
                 }
             }
         }
@@ -112,6 +116,9 @@ class BluetoothManager(private val context: Context) {
         context.unregisterReceiver(discoveryReceiver)
     }
 
+    /**
+     * Request necessary Bluetooth permissions using provided launcher.
+     */
     fun requestBluetoothPermissions(launcher: ActivityResultLauncher<Array<String>>) {
         if (context is Activity && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
             val missingPermissions = mutableListOf<String>()
@@ -129,31 +136,3 @@ class BluetoothManager(private val context: Context) {
         }
     }
 }
-
-/**
- * =====================================================================================
- * Example Usage for UI Development
- * =====================================================================================
- * This section provides example snippets of how to integrate BluetoothManager into an
- * Android Activity or ViewModel.
- *
- * -- Initialize BluetoothManager inside an Activity or ViewModel
- * val bluetoothManager = BluetoothManager(this)
- *
- * -- Start scanning for Bluetooth devices when a button is clicked
- * bluetoothManager.startDiscovery()
- *
- *  Stop scanning when needed
- * bluetoothManager.stopDiscovery()
- *
- * -- Make the device discoverable for 2 minutes
- * bluetoothManager.makeDeviceDiscoverable(120)
- *
- * -- Pair with a selected device (assuming you have a reference to a BluetoothDevice)
- * val selectedDevice: BluetoothDevice = discoveredDevices[0] // Example selection
- * bluetoothManager.pairDevice(selectedDevice)
- *
- * -- Clean up resources when done (e.g., in onDestroy of an Activity)
- * bluetoothManager.cleanup()
- * =====================================================================================
- */
