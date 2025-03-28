@@ -6,11 +6,14 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
+import android.os.Handler
+import android.os.Looper
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -92,12 +95,33 @@ class FileSender : AppCompatActivity() {
                     Manifest.permission.BLUETOOTH_CONNECT
                 ))
             } else {
+                Toast.makeText(this, "Finding Bluetooth devices...", Toast.LENGTH_SHORT).show()
                 bluetoothManager.startDiscovery()
             }
         } else {
+            Toast.makeText(this, "Finding Bluetooth devices...", Toast.LENGTH_SHORT).show()
             bluetoothManager.startDiscovery()
         }
     }
+
+    private fun showBluetoothDevicesPopup() {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_bluetooth_devices, null)
+        val recyclerView = dialogView.findViewById<RecyclerView>(R.id.deviceRecyclerView)
+
+        val adapter = BluetoothDeviceAdapter(bluetoothDevices)
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        recyclerView.adapter = adapter
+
+        val dialog = AlertDialog.Builder(this)
+            .setTitle("Available Bluetooth Devices")
+            .setView(dialogView)
+            .setNegativeButton("Cancel", null)
+            .create()
+
+        dialog.show()
+    }
+
+
 
     private val requestBluetoothPermissions = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -144,9 +168,17 @@ class FileSender : AppCompatActivity() {
 
         bluetoothManager = BluetoothManager(this)
 
-        bluetoothSendFileButton.setOnClickListener{
+        bluetoothSendFileButton.setOnClickListener {
+            bluetoothDevices.clear()
             bluetoothManager.startDiscovery()
+            Toast.makeText(this, "Finding Bluetooth devices...", Toast.LENGTH_SHORT).show()
+
+            // Show dialog after a short delay
+            Handler(Looper.getMainLooper()).postDelayed({
+                showBluetoothDevicesPopup()
+            }, 3000)
         }
+
 
 
 //        fileRecyclerView.adapter = fileAdapter
