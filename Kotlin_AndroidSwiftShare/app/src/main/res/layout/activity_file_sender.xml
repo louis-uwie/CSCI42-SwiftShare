@@ -27,12 +27,12 @@
     <TextView
         android:id="@+id/filePreview"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Preview: "
-        android:textSize="16sp"
+        android:layout_height="354dp"
         android:layout_marginBottom="12dp"
+        android:background="#DDDDDD"
         android:padding="8dp"
-        android:background="#DDDDDD"/>
+        android:text="Preview: "
+        android:textSize="16sp" />
 
     <!-- Device Discovery Title -->
     <TextView

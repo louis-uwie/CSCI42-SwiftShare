@@ -18,6 +18,10 @@ import java.io.File
 
 class FileSender : AppCompatActivity() {
 
+    /**
+     * All Variables utilized in the Program
+     */
+
     private lateinit var fileRecyclerView: RecyclerView // RECYCLER VIEW TO DISPLAY LOCAL FILES
     private lateinit var previewTextView: TextView // TEXT PREVIEW FOR SELECTED FILE
     private lateinit var bluetoothDeviceRecyclerView: RecyclerView // RECYCLER VIEW TO DISPLAY BLUETOOTH DEVICES
@@ -25,6 +29,12 @@ class FileSender : AppCompatActivity() {
     private val fileList = mutableListOf<File>() // LIST OF FILES TO DISPLAY
     private val bluetoothDevices = mutableListOf<BluetoothDevice>() // LIST OF DEVICES TO SEND TO
 
+    /** ----------------------------------------[World Border]------------------------------------------------------- */
+
+
+    /**
+     * ALL LOCAL FILE REQUEST FUNCTIONALITIES -----------------------------------------------------------------------------------------------
+     */
 
     private val filePermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -36,42 +46,6 @@ class FileSender : AppCompatActivity() {
         }
     }
 
-
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_file_sender)
-
-        // INITIALIZE UI COMPONENTS
-        fileRecyclerView = findViewById(R.id.fileRecyclerView)
-        previewTextView = findViewById(R.id.filePreview)
-        bluetoothDeviceRecyclerView = findViewById(R.id.bluetoothDeviceRecyclerView)
-
-        // SETUP FILE RECYCLERVIEW
-        fileRecyclerView.layoutManager = LinearLayoutManager(this)
-        val fileAdapter = FileAdapter(fileList) { selectedFile ->
-            previewTextView.text = "Preview: ${selectedFile.name}"
-            startBluetoothDiscovery() // START BLUETOOTH SCAN ON FILE SELECT
-        }
-        fileRecyclerView.adapter = fileAdapter
-
-        // SETUP BLUETOOTH DEVICE RECYCLERVIEW
-        bluetoothDeviceRecyclerView.layoutManager = LinearLayoutManager(this)
-        val deviceAdapter = BluetoothDeviceAdapter(bluetoothDevices)
-        bluetoothDeviceRecyclerView.adapter = deviceAdapter
-
-        // INITIALIZE BLUETOOTH MANAGER
-        bluetoothManager = BluetoothManager(this)
-        bluetoothManager.onDeviceDiscovered = { device ->
-            runOnUiThread {
-                bluetoothDevices.add(device)
-                deviceAdapter.notifyItemInserted(bluetoothDevices.size - 1)
-            }
-        }
-        //REQUEST FILE PERMISSIONS
-        requestFilePermissions()
-    }
-
     // LOAD FILES FROM INTERNAL/EXTERNAL STORAGE (BASIC IMPLEMENTATION)
     private fun loadFilesFromStorage() {
         val dir = Environment.getExternalStorageDirectory()
@@ -81,6 +55,30 @@ class FileSender : AppCompatActivity() {
             fileRecyclerView.adapter?.notifyDataSetChanged()
         }
     }
+
+    private fun requestFilePermissions() {
+        val permissionsToRequest = mutableListOf<String>()
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            permissionsToRequest.add(Manifest.permission.READ_MEDIA_IMAGES)
+            permissionsToRequest.add(Manifest.permission.READ_MEDIA_VIDEO)
+        } else {
+            permissionsToRequest.add(Manifest.permission.READ_EXTERNAL_STORAGE)
+        }
+
+        filePermissionLauncher.launch(permissionsToRequest.toTypedArray())
+    }
+
+
+    /**
+     * END LOCAL FILE FUNCTIONALITIES -----------------------------------------------------------------------------------------------
+     */
+
+    /** ----------------------------------------[World Border]------------------------------------------------------- */
+
+    /**
+     * ALL BLUETOOTH FUNCTIONALITIES -----------------------------------------------------------------------------------------------
+     */
 
     // REQUEST BLUETOOTH PERMISSIONS AND START DISCOVERY
     private fun startBluetoothDiscovery() {
@@ -116,17 +114,49 @@ class FileSender : AppCompatActivity() {
         bluetoothManager.cleanup() // UNREGISTER RECEIVER
     }
 
-    private fun requestFilePermissions() {
-        val permissionsToRequest = mutableListOf<String>()
+    /**
+     * END BLUETOOTH FUNCTIONALITIES -----------------------------------------------------------------------------------------------
+     */
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            permissionsToRequest.add(Manifest.permission.READ_MEDIA_IMAGES)
-            permissionsToRequest.add(Manifest.permission.READ_MEDIA_VIDEO)
-        } else {
-            permissionsToRequest.add(Manifest.permission.READ_EXTERNAL_STORAGE)
+    /** ----------------------------------------[World Border]------------------------------------------------------- */
+
+    /**
+     * ON-CREATE Initializes the functionalities on launch of FileSender.kt
+     */
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_file_sender)
+
+        // INITIALIZE UI COMPONENTS
+        fileRecyclerView = findViewById(R.id.fileRecyclerView)
+        previewTextView = findViewById(R.id.filePreview)
+        bluetoothDeviceRecyclerView = findViewById(R.id.bluetoothDeviceRecyclerView)
+
+        // SETUP FILE RECYCLERVIEW
+        fileRecyclerView.layoutManager = LinearLayoutManager(this)
+        val fileAdapter = FileAdapter(fileList) { selectedFile ->
+            previewTextView.text = "Preview: ${selectedFile.name}"
+
+            startBluetoothDiscovery()
         }
 
-        filePermissionLauncher.launch(permissionsToRequest.toTypedArray())
-    }
+        fileRecyclerView.adapter = fileAdapter
 
+        // SETUP BLUETOOTH DEVICE RECYCLERVIEW
+        bluetoothDeviceRecyclerView.layoutManager = LinearLayoutManager(this)
+        val deviceAdapter = BluetoothDeviceAdapter(bluetoothDevices)
+        bluetoothDeviceRecyclerView.adapter = deviceAdapter
+
+        // INITIALIZE BLUETOOTH MANAGER
+        bluetoothManager = BluetoothManager(this)
+        bluetoothManager.onDeviceDiscovered = { device ->
+            runOnUiThread {
+                bluetoothDevices.add(device)
+                deviceAdapter.notifyItemInserted(bluetoothDevices.size - 1)
+            }
+        }
+
+        requestFilePermissions() // Call File Access / Permission Request
+    }
 }
