@@ -1,54 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:padding="16dp">
 
-    <!-- Title -->
-    <TextView
-        android:id="@+id/titleText"
-        android:layout_width="wrap_content"
+    <!-- Search Bar -->
+    <EditText
+        android:id="@+id/searchBar"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Select a File to Send"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="8dp"/>
+        android:layout_marginTop="10dp"
+        android:hint="Search..."
+        android:drawableStart="@android:drawable/ic_menu_search"
+        android:padding="12dp"
+        android:inputType="text"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- File List -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/fileRecyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:layout_marginBottom="8dp"
-        android:background="#EEEEEE"/>
-
-    <!-- File Preview -->
-    <TextView
-        android:id="@+id/filePreview"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Preview: "
-        android:textSize="16sp"
-        android:layout_marginBottom="12dp"
-        android:padding="8dp"
-        android:background="#DDDDDD"/>
-
-    <!-- Device Discovery Title -->
-    <TextView
-        android:id="@+id/deviceText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Discovered Devices"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="4dp"/>
-
-    <!-- Discovered Bluetooth Devices -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/bluetoothDeviceRecyclerView"
-        android:layout_width="match_parent"
+    <!-- Middle Content -->
+    <LinearLayout
+        android:id="@+id/contentContainer"
+        android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:background="#EEEEEE"/>
-</LinearLayout>
+        android:layout_marginTop="10dp"
+        android:orientation="vertical"
+        android:padding="12dp"
+        app:layout_constraintTop_toBottomOf="@id/searchBar"
+        app:layout_constraintBottom_toTopOf="@id/SendFileBTN"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- Title -->
+        <TextView
+            android:id="@+id/titleText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="8dp"
+            android:text="Select a File to Send"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <!-- File List -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/fileRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_marginBottom="8dp"
+            android:background="#EEEEEE" />
+
+        <!-- File Preview -->
+        <TextView
+            android:id="@+id/filePreview"
+            android:layout_width="match_parent"
+            android:layout_height="330dp"
+            android:text="Preview: "
+            android:textSize="16sp"
+            android:layout_marginBottom="12dp"
+            android:padding="8dp"
+            android:background="#DDDDDD"/>
+    </LinearLayout>
+
+    <!-- Send File Button at bottom -->
+    <Button
+        android:id="@+id/SendFileBTN"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Send File"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+</androidx.constraintlayout.widget.ConstraintLayout>
