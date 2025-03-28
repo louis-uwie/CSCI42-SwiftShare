@@ -2,11 +2,13 @@ package com.finals.kotlin_androidswiftshare
 
 import android.Manifest
 import android.bluetooth.BluetoothDevice
+import android.content.pm.PackageManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.annotation.RequiresPermission
+import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.RecyclerView
 
 class BluetoothDeviceAdapter(private val devices: List<BluetoothDevice>) :
@@ -25,8 +27,14 @@ class BluetoothDeviceAdapter(private val devices: List<BluetoothDevice>) :
     @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
     override fun onBindViewHolder(holder: DeviceViewHolder, position: Int) {
         val device = devices[position]
-        holder.deviceName.text = device.name ?: "Unnamed Device"
+        val name = if (ActivityCompat.checkSelfPermission(holder.itemView.context, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED) {
+            device.name ?: "Unnamed Device"
+        } else {
+            "Unknown Device"
+        }
+        holder.deviceName.text = "$name\n${device.address}"
     }
+
 
     override fun getItemCount(): Int = devices.size
 }

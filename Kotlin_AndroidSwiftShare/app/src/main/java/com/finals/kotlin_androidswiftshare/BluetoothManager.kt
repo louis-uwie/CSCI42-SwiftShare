@@ -39,13 +39,14 @@ class BluetoothManager(private val context: Context) {
                 BluetoothDevice.ACTION_FOUND -> {
                     val device: BluetoothDevice? = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
                     device?.let {
+                        Log.d("BluetoothManager", "Device Found: name=${it.name}, address=${it.address}")
                         if (!discoveredDevices.contains(it)) {
                             discoveredDevices.add(it)
-                            Log.d("BluetoothManager", "Discovered: ${it.name} - ${it.address}")
                             onDeviceDiscovered?.invoke(it)
                         }
-                    }
+                    } ?: Log.d("BluetoothManager", "Device found but is null.")
                 }
+
 
                 /**
                  * Triggered when the discovery process is finished.
@@ -74,9 +75,11 @@ class BluetoothManager(private val context: Context) {
     fun startDiscovery() {
         bluetoothAdapter?.let {
             if (it.isDiscovering) it.cancelDiscovery()
-            it.startDiscovery()
+            val started = it.startDiscovery()
+            Log.d("BluetoothManager", "Discovery started: $started")
         }
     }
+
 
     /**
      * Stops any ongoing Bluetooth discovery process.
