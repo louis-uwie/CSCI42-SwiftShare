@@ -30,14 +30,14 @@ public class FileExplorer extends Application {
         // Label to show selected file
         selectedFileLabel = new Label("Selected file: None");
 
-        // Handle directory selection
+        // directory selection
         fileTree.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null) {
                 updateFileList(newVal.getValue());
             }
         });
 
-        // Handle file selection
+        // handle file selection
         fileList.setOnMouseClicked(event -> {
             File selectedFile = fileList.getSelectionModel().getSelectedItem();
             if (selectedFile != null) {
@@ -45,7 +45,7 @@ public class FileExplorer extends Application {
             }
         });
 
-        // Layout
+        // layout
         root.setLeft(new ScrollPane(fileTree));
         root.setCenter(new ScrollPane(fileList));
         root.setBottom(selectedFileLabel);
@@ -56,14 +56,14 @@ public class FileExplorer extends Application {
         primaryStage.show();
     }
 
-    // Recursively create a TreeItem node for directories
+    // recursively create TreeItem node for directories
     private TreeItem<File> createNode(File file) {
         TreeItem<File> node = new TreeItem<>(file);
         node.setExpanded(false); // Start collapsed
     
-        // If it's a directory, load subdirectories lazily
+        // if directory, load subdirectories lazily
         if (file.isDirectory()) {
-            node.getChildren().add(new TreeItem<>(new File("Loading..."))); // Placeholder
+            node.getChildren().add(new TreeItem<>(new File("Loading..."))); // placeholder
             node.addEventHandler(TreeItem.branchExpandedEvent(), event -> {
                 if (node.getChildren().size() == 1 && node.getChildren().get(0).getValue().getName().equals("Loading...")) {
                     node.getChildren().clear();
@@ -77,7 +77,7 @@ public class FileExplorer extends Application {
     }
     
 
-    // Update the ListView with files in the selected directory
+    // update ListView with files in the selected directory
     private void updateFileList(File directory) {
         fileList.getItems().clear();
         File[] files = directory.listFiles(File::isFile);
