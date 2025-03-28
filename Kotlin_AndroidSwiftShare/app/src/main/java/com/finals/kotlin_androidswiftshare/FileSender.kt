@@ -25,6 +25,19 @@ class FileSender : AppCompatActivity() {
     private val fileList = mutableListOf<File>() // LIST OF FILES TO DISPLAY
     private val bluetoothDevices = mutableListOf<BluetoothDevice>() // LIST OF DEVICES TO SEND TO
 
+
+    private val filePermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        if (permissions.values.all { it }) {
+            loadFilesFromStorage() // ✅ Only load files when permission is granted
+        } else {
+            Toast.makeText(this, "File permission denied", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_file_sender)
@@ -55,9 +68,8 @@ class FileSender : AppCompatActivity() {
                 deviceAdapter.notifyItemInserted(bluetoothDevices.size - 1)
             }
         }
-
-        // LOAD FILES FROM LOCAL STORAGE
-        loadFilesFromStorage()
+        //REQUEST FILE PERMISSIONS
+        requestFilePermissions()
     }
 
     // LOAD FILES FROM INTERNAL/EXTERNAL STORAGE (BASIC IMPLEMENTATION)
@@ -65,7 +77,7 @@ class FileSender : AppCompatActivity() {
         val dir = Environment.getExternalStorageDirectory()
         val files = dir.listFiles()
         if (files != null) {
-            fileList.addAll(files.filter { it.isFile })
+            fileList.addAll(files.filter { it.isFile && it.extension in listOf("txt", "pdf", "jpg", "png") })
             fileRecyclerView.adapter?.notifyDataSetChanged()
         }
     }
@@ -103,4 +115,18 @@ class FileSender : AppCompatActivity() {
         super.onDestroy()
         bluetoothManager.cleanup() // UNREGISTER RECEIVER
     }
+
+    private fun requestFilePermissions() {
+        val permissionsToRequest = mutableListOf<String>()
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            permissionsToRequest.add(Manifest.permission.READ_MEDIA_IMAGES)
+            permissionsToRequest.add(Manifest.permission.READ_MEDIA_VIDEO)
+        } else {
+            permissionsToRequest.add(Manifest.permission.READ_EXTERNAL_STORAGE)
+        }
+
+        filePermissionLauncher.launch(permissionsToRequest.toTypedArray())
+    }
+
 }

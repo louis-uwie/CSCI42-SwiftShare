@@ -1,12 +1,18 @@
 package com.finals.kotlin_androidswiftshare
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.bluetooth.*
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.PackageManager
 import android.util.Log
+import androidx.activity.result.ActivityResultLauncher
+import androidx.core.app.ActivityCompat
+import android.Manifest
+
 
 class BluetoothManager(private val context: Context) {
     private val bluetoothAdapter: BluetoothAdapter? = BluetoothAdapter.getDefaultAdapter()
@@ -104,6 +110,23 @@ class BluetoothManager(private val context: Context) {
      */
     fun cleanup() {
         context.unregisterReceiver(discoveryReceiver)
+    }
+
+    fun requestBluetoothPermissions(launcher: ActivityResultLauncher<Array<String>>) {
+        if (context is Activity && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+            val missingPermissions = mutableListOf<String>()
+
+            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
+                missingPermissions.add(Manifest.permission.BLUETOOTH_SCAN)
+            }
+            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                missingPermissions.add(Manifest.permission.BLUETOOTH_CONNECT)
+            }
+
+            if (missingPermissions.isNotEmpty()) {
+                launcher.launch(missingPermissions.toTypedArray())
+            }
+        }
     }
 }
 

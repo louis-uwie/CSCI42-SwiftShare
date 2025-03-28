@@ -5,13 +5,12 @@ plugins {
 
 android {
     namespace = "com.finals.kotlin_androidswiftshare"
-    compileSdk = 35
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.finals.kotlin_androidswiftshare"
         minSdk = 24
-        maxSdk = 32
-        targetSdk = 35
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
