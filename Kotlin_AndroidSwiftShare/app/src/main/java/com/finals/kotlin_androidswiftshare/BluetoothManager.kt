@@ -12,6 +12,8 @@ class BluetoothManager(private val context: Context) {
     private val bluetoothAdapter: BluetoothAdapter? = BluetoothAdapter.getDefaultAdapter()
     private val discoveredDevices = mutableListOf<BluetoothDevice>()
 
+    var onDeviceDiscovered: ((BluetoothDevice) -> Unit)? = null
+
     /**
      * BroadcastReceiver to handle Bluetooth discovery events.
      * - Listens for ACTION_FOUND when a device is discovered.
@@ -31,6 +33,8 @@ class BluetoothManager(private val context: Context) {
                         if (!discoveredDevices.contains(it)) {
                             discoveredDevices.add(it)
                             Log.d("BluetoothManager", "Discovered: ${it.name} - ${it.address}")
+
+                            onDeviceDiscovered?.invoke(it)
                         }
                     }
                 }

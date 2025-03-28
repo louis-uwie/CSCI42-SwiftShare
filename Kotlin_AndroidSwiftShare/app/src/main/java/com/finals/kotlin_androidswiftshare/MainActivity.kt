@@ -2,6 +2,7 @@ package com.finals.kotlin_androidswiftshare
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.bluetooth.BluetoothDevice
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -13,10 +14,16 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var bluetoothManager: BluetoothManager // INITIALIZING BluetoothManager.class INTO MainAactivity
+
+    private lateinit var recyclerView: RecyclerView // UI ELEMENT FOR DISPLAYING BLUETOOTH DEVICES
+    private val foundDevices = mutableListOf<BluetoothDevice>() // DYNAMIC LIST OF DISCOVERED DEVICES
+    private lateinit var adapter: BluetoothDeviceAdapter // ADAPTER FOR THE RECYCLERVIEW
 
     private val requestPermissionsLauncher =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
@@ -45,8 +52,23 @@ class MainActivity : AppCompatActivity() {
         // Initial Request App Permissions
         requestStoragePermissions()
 
+        bluetoothManager = BluetoothManager(this) // INITIALIZE BLUETOOTH MANAGER
+
         val fileLocatorButton = findViewById<Button>(R.id.LocateFileBTN)
         val startDiscoveryButton = findViewById<Button>(R.id.deviceDiscovery)
+        recyclerView = findViewById(R.id.deviceRecyclerView) // LINK TO RECYCLERVIEW IN XML
+
+        adapter = BluetoothDeviceAdapter(foundDevices)
+        recyclerView.adapter = adapter
+        recyclerView.layoutManager = LinearLayoutManager(this)
+
+        // CALLBACK: WHEN DEVICE IS DISCOVERED, UPDATE UI
+        bluetoothManager.onDeviceDiscovered = { device ->
+            runOnUiThread {
+                foundDevices.add(device)
+                adapter.notifyItemInserted(foundDevices.size - 1)
+            }
+        }
 
         fileLocatorButton.setOnClickListener{
             //TODO: Open File Locator
@@ -64,14 +86,8 @@ class MainActivity : AppCompatActivity() {
                     e.printStackTrace()
                     Toast.makeText(this, "Missing Bluetooth permission", Toast.LENGTH_SHORT).show()
                 }
-
             }
         }
-
-
-
-
-
     }
 
     /**
@@ -107,7 +123,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun openFileLocator(){
-
+        // TODO: Implement system file picker logic
     }
 
     /**
@@ -128,7 +144,4 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, "Bluetooth permissions denied", Toast.LENGTH_SHORT).show()
         }
     }
-
 }
-
-
