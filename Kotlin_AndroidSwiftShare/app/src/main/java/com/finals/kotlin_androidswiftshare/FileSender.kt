@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -131,31 +132,38 @@ class FileSender : AppCompatActivity() {
         // INITIALIZE UI COMPONENTS
         fileRecyclerView = findViewById(R.id.fileRecyclerView)
         previewTextView = findViewById(R.id.filePreview)
-        bluetoothDeviceRecyclerView = findViewById(R.id.bluetoothDeviceRecyclerView)
+//        bluetoothDeviceRecyclerView = findViewById(R.id.bluetoothDeviceRecyclerView)
 
         // SETUP FILE RECYCLERVIEW
         fileRecyclerView.layoutManager = LinearLayoutManager(this)
         val fileAdapter = FileAdapter(fileList) { selectedFile ->
             previewTextView.text = "Preview: ${selectedFile.name}"
-
-            startBluetoothDiscovery()
         }
 
-        fileRecyclerView.adapter = fileAdapter
+        val bluetoothSendFileButton = findViewById<Button>(R.id.SendFileBTN)
+
+        bluetoothManager = BluetoothManager(this)
+
+        bluetoothSendFileButton.setOnClickListener{
+            bluetoothManager.startDiscovery()
+        }
+
+
+//        fileRecyclerView.adapter = fileAdapter
 
         // SETUP BLUETOOTH DEVICE RECYCLERVIEW
-        bluetoothDeviceRecyclerView.layoutManager = LinearLayoutManager(this)
-        val deviceAdapter = BluetoothDeviceAdapter(bluetoothDevices)
-        bluetoothDeviceRecyclerView.adapter = deviceAdapter
+//        bluetoothDeviceRecyclerView.layoutManager = LinearLayoutManager(this)
+//        val deviceAdapter = BluetoothDeviceAdapter(bluetoothDevices)
+//        bluetoothDeviceRecyclerView.adapter = deviceAdapter
 
         // INITIALIZE BLUETOOTH MANAGER
-        bluetoothManager = BluetoothManager(this)
-        bluetoothManager.onDeviceDiscovered = { device ->
-            runOnUiThread {
-                bluetoothDevices.add(device)
-                deviceAdapter.notifyItemInserted(bluetoothDevices.size - 1)
-            }
-        }
+//        bluetoothManager = BluetoothManager(this)
+//        bluetoothManager.onDeviceDiscovered = { device ->
+//            runOnUiThread {
+//                bluetoothDevices.add(device)
+//                deviceAdapter.notifyItemInserted(bluetoothDevices.size - 1)
+//            }
+//        }
 
         requestFilePermissions() // Call File Access / Permission Request
     }
