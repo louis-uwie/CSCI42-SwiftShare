@@ -23,6 +23,13 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+        /**
+         * As of now, we only have this button for our whole functionality.
+         * Might need to have a separate one for LAN based sending
+         *
+         * TODO: Settings Button (?), Send via LAN?
+         * TODO (minor): Change fileSenderButton to bluetoothSenderButton, create localSenderButton for LAN
+         */
 
         val fileSenderButton = findViewById<Button>(R.id.LocateFileBTN)
 
