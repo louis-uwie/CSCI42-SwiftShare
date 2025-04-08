@@ -8,6 +8,8 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 
+import javax.bluetooth.*;
+
 public class SendScreenController {
 
     double w = 1024;

@@ -7,6 +7,9 @@ import javafx.geometry.Pos;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
+
+import javax.bluetooth.*;
 
 public class ReceiveScreenController {
 
@@ -21,9 +24,15 @@ public class ReceiveScreenController {
     GridPane gridPane;
     @FXML
     VBox centerVBox;
+    @FXML
+    Text deviceIdText;
+    @FXML
+    Text deviceNameText;
 
     @FXML
-    public void initialize() {
+    public void initialize() throws BluetoothStateException {
+
+        LocalDevice localDevice = LocalDevice.getLocalDevice();
 
         mainVBox.setPrefSize(w, h);
         topAnchorPane.setMaxHeight(h*0.1);
@@ -32,6 +41,9 @@ public class ReceiveScreenController {
         gridPane.setAlignment(Pos.CENTER);
  
         centerVBox.setPrefWidth(w/2);
+
+        deviceNameText.setText("Device Name: " + localDevice.getFriendlyName());
+        deviceIdText.setText("Device ID: " + localDevice.getBluetoothAddress());
  
     }
     
@@ -50,5 +62,9 @@ public class ReceiveScreenController {
         System.out.println("Settings Button Pressed");
     }
 
-    
+    @FXML
+    private void StartConnection() {
+        BluetoothServer server = new BluetoothServer();
+        server.run();
+    }
 }

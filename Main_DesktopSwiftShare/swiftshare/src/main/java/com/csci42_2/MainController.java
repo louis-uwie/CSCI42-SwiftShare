@@ -41,6 +41,11 @@ public class MainController {
     }
     
     @FXML
+    private void DeviceButton() throws IOException {
+        App.setRoot("deviceScreen");
+    }
+
+    @FXML
     private void SendButton() throws IOException {
         App.setRoot("sendScreen");
     }

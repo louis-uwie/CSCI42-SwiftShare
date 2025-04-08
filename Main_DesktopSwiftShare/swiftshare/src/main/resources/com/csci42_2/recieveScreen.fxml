@@ -18,12 +18,13 @@
          <children>
             <VBox fx:id="centerVBox" alignment="CENTER" spacing="20" xmlns:fx="http://javafx.com/fxml/1" GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
                <Label text="Ready to Receive" textAlignment="CENTER" HBox.hgrow="ALWAYS" GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
+               <Text fx:id="deviceNameText" text="Device Name:" textAlignment="CENTER" />
                <Text fx:id="deviceIdText" text="Device ID:" textAlignment="CENTER" />
             </VBox>
             <VBox fx:id="centerVBox" alignment="CENTER" spacing="20" xmlns:fx="http://javafx.com/fxml/1" GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
                <Label text="File Details Placeholder" HBox.hgrow="ALWAYS" />
                <Button fx:id="acceptButton" text="Accept" onAction="#Accept" HBox.hgrow="ALWAYS"/>
-               <Button fx:id="rejectButton" text="Reject" onAction="#Reject" HBox.hgrow="ALWAYS"/>
+               <Button fx:id="rejectButton" text="Reject" onAction="#StartConnection" HBox.hgrow="ALWAYS"/>
             </VBox>
          </children>
       </GridPane>

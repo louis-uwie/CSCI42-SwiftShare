@@ -6,8 +6,9 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.text.*?>
+<?import javafx.scene.control.ListView?>
 
-<VBox fx:id="mainVBox" spacing="20.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.csci42_2.ReceiveScreenController">
+<VBox fx:id="mainVBox" spacing="20.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.csci42_2.DeviceScreenController">
    <children>
       <AnchorPane fx:id="topAnchorPane" xmlns:fx="http://javafx.com/fxml/1">
          <Label text="SwiftShare" AnchorPane.leftAnchor="25" />
@@ -21,10 +22,16 @@
                <Text fx:id="deviceNameText" text="Device Name:" textAlignment="CENTER" />
                <Text fx:id="deviceIdText" text="Device ID:" textAlignment="CENTER" />
             </VBox>
-            <VBox fx:id="centerVBox" alignment="CENTER" spacing="20" xmlns:fx="http://javafx.com/fxml/1" GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+            <VBox fx:id="buttonsVBox" alignment="CENTER" spacing="20" xmlns:fx="http://javafx.com/fxml/1" GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
                <Label text="File Details Placeholder" HBox.hgrow="ALWAYS" />
-               <Button fx:id="acceptButton" text="Accept" onAction="#Accept" HBox.hgrow="ALWAYS"/>
-               <Button fx:id="rejectButton" text="Reject" onAction="#StartConnection" HBox.hgrow="ALWAYS"/>
+               <Button fx:id="connectButton" text="Connect" onAction="#Accept" HBox.hgrow="ALWAYS"/>
+               <Button fx:id="rejectButton" text="Reject" onAction="#DiscoverDevices" HBox.hgrow="ALWAYS"/>
+            </VBox>
+            <VBox fx:id="knownVBox" alignment="CENTER" spacing="20" xmlns:fx="http://javafx.com/fxml/1" GridPane.columnIndex="2" GridPane.rowIndex="1" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+               <Label text="Known Devices" HBox.hgrow="ALWAYS" />
+            </VBox>
+            <VBox fx:id="discoverVBox" alignment="CENTER" spacing="20" xmlns:fx="http://javafx.com/fxml/1" GridPane.columnIndex="3" GridPane.rowIndex="1" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+               <Label text="Discovered Devices" HBox.hgrow="ALWAYS" />
             </VBox>
          </children>
       </GridPane>

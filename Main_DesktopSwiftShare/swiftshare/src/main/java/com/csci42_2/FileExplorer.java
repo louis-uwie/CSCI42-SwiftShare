@@ -5,9 +5,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
-import java.io.File;
-
-public class FileExplorer extends Application {
+import java.io.File; extends Application {
     private TreeView<File> fileTree;
     private ListView<File> fileList;
     private Label selectedFileLabel;
