@@ -25,6 +25,7 @@ public class DeviceScreenController {
 
     ArrayList<Device> knownDevices = new ArrayList<>();
     ArrayList<Device> discoveredDevices = new ArrayList<>();
+    ArrayList<Service> services = new ArrayList<>();
 
     Device currentDevice;
 
@@ -47,14 +48,16 @@ public class DeviceScreenController {
 
     ListView<Device> knownDeviceList;
     ListView<Device> discoveredDeviceList;
+    ListView<Service> serviceList;
     
     @FXML
     public void initialize() throws BluetoothStateException {
 
         knownDeviceList = new ListView<>();
         discoveredDeviceList = new ListView<>();
+        serviceList = new ListView<>();
         knownVBox.getChildren().add(knownDeviceList);
-        discoverVBox.getChildren().add(discoveredDeviceList);
+        discoverVBox.getChildren().add(serviceList);
 
         LocalDevice localDevice = LocalDevice.getLocalDevice();
 
@@ -161,7 +164,11 @@ public class DeviceScreenController {
         }
         @Override
         public void servicesDiscovered(int transID, ServiceRecord[] servRecord) {
-            System.out.println(servRecord);
+            for (ServiceRecord sr : servRecord) {
+                services.add(new Service(sr));
+            }
+            serviceList.getItems().clear();
+            serviceList.getItems().addAll(services);
         }
         @Override
         public void serviceSearchCompleted(int transID, int respCode) {}
