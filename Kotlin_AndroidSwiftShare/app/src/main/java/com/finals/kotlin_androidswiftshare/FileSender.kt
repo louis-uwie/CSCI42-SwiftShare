@@ -1,6 +1,7 @@
 package com.finals.kotlin_androidswiftshare
 
 import android.Manifest
+import android.R.id.message
 import android.bluetooth.BluetoothDevice
 import android.content.pm.PackageManager
 import android.os.Build
@@ -31,8 +32,7 @@ class FileSender : AppCompatActivity() {
     private val fileList = mutableListOf<File>() // LIST OF FILES TO DISPLAY
     private val bluetoothDevices = mutableListOf<BluetoothDevice>() // LIST OF DEVICES TO SEND TO
 
-    /** ----------------------------------------[World Border]------------------------------------------------------- */
-
+    
     /**
      * ALL LOCAL FILE REQUEST FUNCTIONALITIES -----------------------------------------------------------------------------------------------
      */
@@ -51,7 +51,14 @@ class FileSender : AppCompatActivity() {
         val dir = Environment.getExternalStorageDirectory()
         val files = dir.listFiles()
         if (files != null) {
-            fileList.addAll(files.filter { it.isFile && it.extension in listOf("txt", "pdf", "jpg", "png") })
+            fileList.addAll(files.filter {
+                it.isFile && it.extension in listOf(
+                    "txt",
+                    "pdf",
+                    "jpg",
+                    "png"
+                )
+            })
             fileRecyclerView.adapter?.notifyDataSetChanged()
         }
     }
@@ -73,20 +80,26 @@ class FileSender : AppCompatActivity() {
      * END LOCAL FILE FUNCTIONALITIES -----------------------------------------------------------------------------------------------
      */
 
-    /** ----------------------------------------[World Border]------------------------------------------------------- */
-
     /**
      * ALL BLUETOOTH FUNCTIONALITIES -----------------------------------------------------------------------------------------------
      */
     private fun startBluetoothDiscovery() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED ||
-                ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED
-            ) {
-                requestBluetoothPermissions.launch(arrayOf(
-                    Manifest.permission.BLUETOOTH_SCAN,
+            if (ActivityCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.BLUETOOTH_SCAN
+                ) != PackageManager.PERMISSION_GRANTED ||
+                ActivityCompat.checkSelfPermission(
+                    this,
                     Manifest.permission.BLUETOOTH_CONNECT
-                ))
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                requestBluetoothPermissions.launch(
+                    arrayOf(
+                        Manifest.permission.BLUETOOTH_SCAN,
+                        Manifest.permission.BLUETOOTH_CONNECT
+                    )
+                )
             } else {
                 Toast.makeText(this, "Finding Bluetooth devices...", Toast.LENGTH_SHORT).show()
                 bluetoothManager.startDiscovery()
@@ -116,7 +129,10 @@ class FileSender : AppCompatActivity() {
         bluetoothManager.onDeviceDiscovered = { device ->
             runOnUiThread {
                 try {
-                    val hasPermission = ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED
+                    val hasPermission = ActivityCompat.checkSelfPermission(
+                        this,
+                        Manifest.permission.BLUETOOTH_CONNECT
+                    ) == PackageManager.PERMISSION_GRANTED
                     val name = if (hasPermission) device.name else "Unnamed Device"
 
                     if (!bluetoothDevices.contains(device)) {
@@ -152,7 +168,7 @@ class FileSender : AppCompatActivity() {
      * END BLUETOOTH FUNCTIONALITIES -----------------------------------------------------------------------------------------------
      */
 
-    /** ----------------------------------------[World Border]------------------------------------------------------- */
+
 
     /**
      * ON-CREATE Initializes the functionalities on launch of FileSender.kt
@@ -180,7 +196,10 @@ class FileSender : AppCompatActivity() {
         bluetoothManager.onDeviceDiscovered = { device ->
             runOnUiThread {
                 try {
-                    val hasPermission = ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED
+                    val hasPermission = ActivityCompat.checkSelfPermission(
+                        this,
+                        Manifest.permission.BLUETOOTH_CONNECT
+                    ) == PackageManager.PERMISSION_GRANTED
                     val name = if (hasPermission) device.name else "Unnamed Device"
 
                     if (!bluetoothDevices.contains(device)) {
@@ -194,7 +213,6 @@ class FileSender : AppCompatActivity() {
                 }
             }
         }
-
 
         bluetoothManager.onDiscoveryFinished = {
             runOnUiThread {
@@ -212,7 +230,23 @@ class FileSender : AppCompatActivity() {
             }, 2000) // Adjust delay as needed
         }
 
-
         requestFilePermissions() // Call File Access / Permission Request
+
+        /** ----------------------------------------[LAN Section Start]------------------------------------------------------- */
+
+        val lanManager = LanManager()
+
+        // Start server on one device
+        lanManager.startServer { message ->
+            runOnUiThread {
+                Toast.makeText(this, "Received: $message", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        // Send a file/message from another device
+        lanManager.sendFileTo("192.168.1.5", "Hello from Kotlin!")
+
+        /** ----------------------------------------[LAN Section End]------------------------------------------------------- */
     }
 }
+
