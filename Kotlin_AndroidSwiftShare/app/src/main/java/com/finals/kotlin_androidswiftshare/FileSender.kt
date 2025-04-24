@@ -1,7 +1,6 @@
 package com.finals.kotlin_androidswiftshare
 
 import android.Manifest
-import android.R.id.message
 import android.bluetooth.BluetoothDevice
 import android.content.pm.PackageManager
 import android.os.Build
@@ -32,7 +31,9 @@ class FileSender : AppCompatActivity() {
     private val fileList = mutableListOf<File>() // LIST OF FILES TO DISPLAY
     private val bluetoothDevices = mutableListOf<BluetoothDevice>() // LIST OF DEVICES TO SEND TO
 
-    
+    private var selectedFile: File? = null // SHARED SELECTED FILE FOR BLUETOOTH & LAN
+
+
     /**
      * ALL LOCAL FILE REQUEST FUNCTIONALITIES -----------------------------------------------------------------------------------------------
      */
@@ -76,9 +77,6 @@ class FileSender : AppCompatActivity() {
         filePermissionLauncher.launch(permissionsToRequest.toTypedArray())
     }
 
-    /**
-     * END LOCAL FILE FUNCTIONALITIES -----------------------------------------------------------------------------------------------
-     */
 
     /**
      * ALL BLUETOOTH FUNCTIONALITIES -----------------------------------------------------------------------------------------------
@@ -164,11 +162,6 @@ class FileSender : AppCompatActivity() {
         bluetoothManager.cleanup() // UNREGISTER RECEIVER
     }
 
-    /**
-     * END BLUETOOTH FUNCTIONALITIES -----------------------------------------------------------------------------------------------
-     */
-
-
 
     /**
      * ON-CREATE Initializes the functionalities on launch of FileSender.kt
@@ -184,8 +177,11 @@ class FileSender : AppCompatActivity() {
 
         // SETUP FILE RECYCLERVIEW
         fileRecyclerView.layoutManager = LinearLayoutManager(this)
-        val fileAdapter = FileAdapter(fileList) { selectedFile ->
-            previewTextView.text = "Preview: ${selectedFile.name}"
+
+        // File adapter sets the file to be sent over LAN/BT
+        val fileAdapter = FileAdapter(fileList) { selected ->
+            previewTextView.text = "Preview: ${selected.name}"
+            selectedFile = selected
         }
         fileRecyclerView.adapter = fileAdapter
 
@@ -221,6 +217,11 @@ class FileSender : AppCompatActivity() {
         }
 
         bluetoothSendFileButton.setOnClickListener {
+            if (selectedFile == null) {
+                Toast.makeText(this, "Please select a file first.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
             bluetoothDevices.clear()
             bluetoothDeviceAdapter.notifyDataSetChanged()
             startBluetoothDiscovery()
@@ -234,19 +235,47 @@ class FileSender : AppCompatActivity() {
 
         /** ----------------------------------------[LAN Section Start]------------------------------------------------------- */
 
-        val lanManager = LanManager()
+        val lanManager = LanManager(this) // Instantiate LAN manager
+        val lanSendFileButton = findViewById<Button>(R.id.SendFileLanBTN)
 
-        // Start server on one device
-        lanManager.startServer { message ->
-            runOnUiThread {
-                Toast.makeText(this, "Received: $message", Toast.LENGTH_SHORT).show()
+        // LAN Send Button logic
+        lanSendFileButton.setOnClickListener {
+            if (selectedFile == null) {
+                Toast.makeText(this, "Please select a file first.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            val connectivityManager =
+                getSystemService(CONNECTIVITY_SERVICE) as android.net.ConnectivityManager
+            val network = connectivityManager.activeNetwork
+            val capabilities = connectivityManager.getNetworkCapabilities(network)
+
+            val isConnectedToLAN =
+                capabilities?.hasTransport(android.net.NetworkCapabilities.TRANSPORT_WIFI) == true
+
+            if (isConnectedToLAN) {
+                Toast.makeText(this, "Connected to LAN. Sending file...", Toast.LENGTH_SHORT).show()
+
+                // Start LAN server
+                lanManager.startServer { fileName, content ->
+                    runOnUiThread {
+                        Toast.makeText(
+                            this,
+                            "Received: $fileName (${content.size} bytes)",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                    val receivedFile = File(filesDir, fileName)
+                    receivedFile.writeBytes(content)
+                }
+
+                // Send selected file to known LAN IP
+                lanManager.sendFileTo("192.168.1.5", selectedFile!!)
+            } else {
+                Toast.makeText(this, "Not connected to LAN.", Toast.LENGTH_LONG).show()
             }
         }
-
-        // Send a file/message from another device
-        lanManager.sendFileTo("192.168.1.5", "Hello from Kotlin!")
 
         /** ----------------------------------------[LAN Section End]------------------------------------------------------- */
     }
 }
-
