@@ -9,8 +9,10 @@ import android.content.*
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.core.app.ActivityCompat
+import java.io.File
 import java.io.OutputStream
 import java.util.*
 import kotlin.concurrent.thread
@@ -38,6 +40,9 @@ class BluetoothManager(private val context: Context) {
                     val device: BluetoothDevice? = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
                     device?.let {
                         Log.d("BluetoothManager", "Device Found: name=${it.name}, address=${it.address}")
+                        Log.d("BTDebug", "Found device: ${device.name} - ${device.address}")
+                        Toast.makeText(context, "Found: ${device.name}", Toast.LENGTH_SHORT).show()
+
                         if (!discoveredDevices.contains(it)) {
                             discoveredDevices.add(it)
                             onDeviceDiscovered?.invoke(it)
@@ -173,6 +178,54 @@ class BluetoothManager(private val context: Context) {
             }
         }
     }
+
+    /**
+     * Sends a file (via File object) to a paired Bluetooth device.
+     * This is useful when SAF returns a File path instead of content Uri.
+     */
+    @SuppressLint("MissingPermission")
+    fun sendFileTo(
+        device: BluetoothDevice,
+        file: File,
+        onComplete: (success: Boolean, error: String?) -> Unit
+    ) {
+        thread {
+            try {
+                if (device.bondState != BluetoothDevice.BOND_BONDED) {
+                    onComplete(false, "Device is not paired. Please pair first.")
+                    return@thread
+                }
+
+                bluetoothAdapter?.cancelDiscovery()
+
+                // Create socket securely
+                val socket = device.createRfcommSocketToServiceRecord(APP_UUID)
+
+                socket.connect()
+
+                val outputStream: OutputStream = socket.outputStream
+                val inputStream = file.inputStream()
+
+                val buffer = ByteArray(1024)
+                var bytesRead: Int
+
+                while (inputStream.read(buffer).also { bytesRead = it } != -1) {
+                    outputStream.write(buffer, 0, bytesRead)
+                }
+
+                outputStream.flush()
+                inputStream.close()
+                socket.close()
+
+                onComplete(true, null)
+
+            } catch (e: Exception) {
+                Log.e("BluetoothClient", "Error sending file", e)
+                onComplete(false, e.message)
+            }
+        }
+    }
+
 }
 
 /*
@@ -195,8 +248,8 @@ class BluetoothManager(private val context: Context) {
 
   --SEND FILE TO PAIRED DEVICE--
 
-      val fileUri: Uri = selectedFileUri  // from content picker or file manager
-      bluetoothManager.sendFileToDevice(selectedDevice, fileUri) { success, error ->
+      val file: File = selectedFile  // from SAF or internal cache
+      bluetoothManager.sendFileToDevice(selectedDevice, file) { success, error ->
         if (success) {
             Toast.makeText(context, "File sent!", Toast.LENGTH_SHORT).show()
         } else {
