@@ -2,12 +2,14 @@ package com.finals.kotlin_androidswiftshare
 
 import android.Manifest
 import android.bluetooth.BluetoothDevice
+import android.content.ContentUris
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Environment
-import android.os.Handler
 import android.os.Looper
+import android.provider.MediaStore
+import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
@@ -18,79 +20,221 @@ import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import java.io.File
+import java.io.FileOutputStream
+import java.io.InputStream
 
 class FileSender : AppCompatActivity() {
 
-    /**
-     * All Variables utilized in the Program
-     */
-    private lateinit var fileRecyclerView: RecyclerView // RECYCLER VIEW TO DISPLAY LOCAL FILES
-    private lateinit var previewTextView: TextView // TEXT PREVIEW FOR SELECTED FILE
-    private lateinit var bluetoothManager: BluetoothManager // BLUETOOTH MANAGER INSTANCE
-    private lateinit var bluetoothDeviceAdapter: BluetoothDeviceAdapter // ADAPTER FOR BLUETOOTH DEVICES
-    private val fileList = mutableListOf<File>() // LIST OF FILES TO DISPLAY
-    private val bluetoothDevices = mutableListOf<BluetoothDevice>() // LIST OF DEVICES TO SEND TO
+    private lateinit var fileRecyclerView: RecyclerView
+    private lateinit var previewTextView: TextView
+    private lateinit var bluetoothManager: BluetoothManager
+    private lateinit var bluetoothDeviceAdapter: BluetoothDeviceAdapter
+    private val fileList = mutableListOf<File>()
+    private val bluetoothDevices = mutableListOf<BluetoothDevice>()
+    private var selectedFile: File? = null
 
-    private var selectedFile: File? = null // SHARED SELECTED FILE FOR BLUETOOTH & LAN
-
-
-    /**
-     * ALL LOCAL FILE REQUEST FUNCTIONALITIES -----------------------------------------------------------------------------------------------
-     */
-    private val filePermissionLauncher = registerForActivityResult(
+    private val requestBluetoothPermissions = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
         if (permissions.values.all { it }) {
-            loadFilesFromStorage() // ✅ Only load files when permission is granted
+            bluetoothManager.startDiscovery()
         } else {
-            Toast.makeText(this, "File permission denied", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Bluetooth permissions denied", Toast.LENGTH_SHORT).show()
         }
     }
 
-    // LOAD FILES FROM INTERNAL/EXTERNAL STORAGE (BASIC IMPLEMENTATION)
-    private fun loadFilesFromStorage() {
-        val dir = Environment.getExternalStorageDirectory()
-        val files = dir.listFiles()
-        if (files != null) {
-            fileList.addAll(files.filter {
-                it.isFile && it.extension in listOf(
-                    "txt",
-                    "pdf",
-                    "jpg",
-                    "png"
-                )
-            })
-            fileRecyclerView.adapter?.notifyDataSetChanged()
+    private val permissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        if (permissions.values.all { it }) {
+            loadFilesFromMediaStore()
+        } else {
+            Toast.makeText(this, "Some permissions were denied.", Toast.LENGTH_SHORT).show()
         }
     }
 
-    private fun requestFilePermissions() {
-        val permissionsToRequest = mutableListOf<String>()
+    override fun onDestroy() {
+        super.onDestroy()
+        bluetoothManager.cleanup()
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_file_sender)
+
+        fileRecyclerView = findViewById(R.id.fileRecyclerView)
+        previewTextView = findViewById(R.id.filePreview)
+        val bluetoothSendFileButton = findViewById<Button>(R.id.SendFileBTN)
+        val lanSendFileButton = findViewById<Button>(R.id.SendFileLanBTN)
+
+        fileRecyclerView.layoutManager = LinearLayoutManager(this)
+        val fileAdapter = FileAdapter(fileList) { selected ->
+            previewTextView.text = "Preview: ${selected.name}"
+            selectedFile = selected
+        }
+        fileRecyclerView.adapter = fileAdapter
+
+        bluetoothManager = BluetoothManager(this)
+        bluetoothDeviceAdapter = BluetoothDeviceAdapter(bluetoothDevices)
+
+        bluetoothManager.onDeviceDiscovered = { device ->
+            runOnUiThread {
+                val hasPermission = ActivityCompat.checkSelfPermission(
+                    this, Manifest.permission.BLUETOOTH_CONNECT
+                ) == PackageManager.PERMISSION_GRANTED
+                val name = if (hasPermission) device.name else "Unnamed Device"
+
+                if (!bluetoothDevices.contains(device)) {
+                    bluetoothDevices.add(device)
+                    bluetoothDeviceAdapter.notifyItemInserted(bluetoothDevices.size - 1)
+                    println("Discovered device: $name - ${device.address}")
+                }
+            }
+        }
+
+        bluetoothManager.onDiscoveryFinished = {
+            runOnUiThread { showBluetoothDevicesPopup() }
+        }
+
+        bluetoothSendFileButton.setOnClickListener {
+            if (selectedFile == null) {
+                Toast.makeText(this, "Please select a file first.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            bluetoothDevices.clear()
+            bluetoothDeviceAdapter.notifyDataSetChanged()
+            startBluetoothDiscovery()
+            android.os.Handler(Looper.getMainLooper()).postDelayed({ showBluetoothDevicesPopup() }, 2000)
+        }
+
+        lanSendFileButton.setOnClickListener {
+            if (selectedFile == null) {
+                Toast.makeText(this, "Please select a file first.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            val lanManager = LanManager(this)
+            val connectivityManager = getSystemService(CONNECTIVITY_SERVICE) as android.net.ConnectivityManager
+            val network = connectivityManager.activeNetwork
+            val capabilities = connectivityManager.getNetworkCapabilities(network)
+            val isConnectedToLAN = capabilities?.hasTransport(android.net.NetworkCapabilities.TRANSPORT_WIFI) == true
+
+            if (isConnectedToLAN) {
+                Toast.makeText(this, "Connected to LAN. Sending file...", Toast.LENGTH_SHORT).show()
+
+                lanManager.startServer { fileName, content ->
+                    runOnUiThread {
+                        Toast.makeText(this, "Received: $fileName (${content.size} bytes)", Toast.LENGTH_SHORT).show()
+                    }
+                    val receivedFile = File(filesDir, fileName)
+                    receivedFile.writeBytes(content)
+                }
+
+                lanManager.sendFileTo("192.168.1.5", selectedFile!!)
+            } else {
+                Toast.makeText(this, "Not connected to LAN.", Toast.LENGTH_LONG).show()
+            }
+        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            permissionsToRequest.add(Manifest.permission.READ_MEDIA_IMAGES)
-            permissionsToRequest.add(Manifest.permission.READ_MEDIA_VIDEO)
+            permissionLauncher.launch(
+                arrayOf(
+                    Manifest.permission.READ_MEDIA_IMAGES,
+                    Manifest.permission.READ_MEDIA_VIDEO,
+                    Manifest.permission.READ_EXTERNAL_STORAGE
+                )
+            )
         } else {
-            permissionsToRequest.add(Manifest.permission.READ_EXTERNAL_STORAGE)
+            permissionLauncher.launch(
+                arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
+            )
         }
-
-        filePermissionLauncher.launch(permissionsToRequest.toTypedArray())
     }
 
+    private fun loadFilesFromMediaStore() {
+        val projection = arrayOf(
+            MediaStore.Files.FileColumns._ID,
+            MediaStore.Files.FileColumns.DISPLAY_NAME,
+            MediaStore.Files.FileColumns.MIME_TYPE
+        )
 
-    /**
-     * ALL BLUETOOTH FUNCTIONALITIES -----------------------------------------------------------------------------------------------
-     */
+        val uri = MediaStore.Files.getContentUri("external")
+        val sortOrder = MediaStore.Files.FileColumns.DATE_ADDED + " DESC"
+
+        val selection = MediaStore.Files.FileColumns.MIME_TYPE + " IN (?, ?, ?, ?, ?, ?, ?, ?)"
+        val selectionArgs = arrayOf(
+            "application/pdf",
+            "image/jpeg",
+            "image/png",
+            "text/plain",
+            "application/msword",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            "application/vnd.ms-excel",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
+
+        val cursor = contentResolver.query(uri, projection, selection, selectionArgs, sortOrder)
+        cursor?.use {
+            val idColumn = it.getColumnIndexOrThrow(MediaStore.Files.FileColumns._ID)
+            val nameColumn = it.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DISPLAY_NAME)
+
+            fileList.clear()
+
+            while (it.moveToNext()) {
+                val id = it.getLong(idColumn)
+                val name = it.getString(nameColumn)
+                val contentUri = ContentUris.withAppendedId(uri, id)
+                val file = createLocalCopyFromUri(contentUri, name)
+                if (file != null) {
+                    fileList.add(file)
+                }
+            }
+        }
+
+        Log.d("MediaStore", "Loaded ${fileList.size} files from MediaStore")
+
+        if (fileList.isEmpty()) {
+            Toast.makeText(this, "No supported files found. Try uploading PDFs, images, or documents.", Toast.LENGTH_SHORT).show()
+        }
+
+        fileRecyclerView.adapter?.notifyDataSetChanged()
+    }
+
+    private fun createLocalCopyFromUri(uri: Uri, fileName: String): File? {
+        return try {
+            val file = File(cacheDir, fileName)
+            val inputStream: InputStream? = contentResolver.openInputStream(uri)
+            val outputStream = FileOutputStream(file)
+            inputStream?.copyTo(outputStream)
+            inputStream?.close()
+            outputStream.close()
+            file
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+    private fun showBluetoothDevicesPopup() {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_bluetooth_devices, null)
+        val recyclerView = dialogView.findViewById<RecyclerView>(R.id.deviceRecyclerView)
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        recyclerView.adapter = bluetoothDeviceAdapter
+
+        val dialog = AlertDialog.Builder(this)
+            .setTitle("Available Bluetooth Devices")
+            .setView(dialogView)
+            .setNegativeButton("Cancel", null)
+            .create()
+
+        dialog.show()
+    }
+
     private fun startBluetoothDiscovery() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            if (ActivityCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.BLUETOOTH_SCAN
-                ) != PackageManager.PERMISSION_GRANTED ||
-                ActivityCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.BLUETOOTH_CONNECT
-                ) != PackageManager.PERMISSION_GRANTED
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED ||
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED
             ) {
                 requestBluetoothPermissions.launch(
                     arrayOf(
@@ -106,176 +250,5 @@ class FileSender : AppCompatActivity() {
             Toast.makeText(this, "Finding Bluetooth devices...", Toast.LENGTH_SHORT).show()
             bluetoothManager.startDiscovery()
         }
-    }
-
-    private fun showBluetoothDevicesPopup() {
-        val dialogView = layoutInflater.inflate(R.layout.dialog_bluetooth_devices, null)
-        val recyclerView = dialogView.findViewById<RecyclerView>(R.id.deviceRecyclerView)
-
-        recyclerView.layoutManager = LinearLayoutManager(this)
-        recyclerView.adapter = bluetoothDeviceAdapter
-
-        val dialog = AlertDialog.Builder(this)
-            .setTitle("Available Bluetooth Devices")
-            .setView(dialogView)
-            .setNegativeButton("Cancel", null)
-            .create()
-
-        dialog.show()
-
-        // 🔁 Update UI even after dialog is shown
-        bluetoothManager.onDeviceDiscovered = { device ->
-            runOnUiThread {
-                try {
-                    val hasPermission = ActivityCompat.checkSelfPermission(
-                        this,
-                        Manifest.permission.BLUETOOTH_CONNECT
-                    ) == PackageManager.PERMISSION_GRANTED
-                    val name = if (hasPermission) device.name else "Unnamed Device"
-
-                    if (!bluetoothDevices.contains(device)) {
-                        bluetoothDevices.add(device)
-                        bluetoothDeviceAdapter.notifyItemInserted(bluetoothDevices.size - 1)
-                        println("Discovered device in dialog: $name")
-                    }
-                } catch (e: SecurityException) {
-                    e.printStackTrace()
-                }
-            }
-        }
-    }
-
-
-    private val requestBluetoothPermissions = registerForActivityResult(
-        ActivityResultContracts.RequestMultiplePermissions()
-    ) { permissions ->
-        val allGranted = permissions.values.all { it }
-        if (allGranted) {
-            bluetoothManager.startDiscovery()
-        } else {
-            Toast.makeText(this, "Bluetooth permissions denied", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        bluetoothManager.cleanup() // UNREGISTER RECEIVER
-    }
-
-
-    /**
-     * ON-CREATE Initializes the functionalities on launch of FileSender.kt
-     */
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_file_sender)
-
-        // INITIALIZE UI COMPONENTS
-        fileRecyclerView = findViewById(R.id.fileRecyclerView)
-        previewTextView = findViewById(R.id.filePreview)
-        val bluetoothSendFileButton = findViewById<Button>(R.id.SendFileBTN)
-
-        // SETUP FILE RECYCLERVIEW
-        fileRecyclerView.layoutManager = LinearLayoutManager(this)
-
-        // File adapter sets the file to be sent over LAN/BT
-        val fileAdapter = FileAdapter(fileList) { selected ->
-            previewTextView.text = "Preview: ${selected.name}"
-            selectedFile = selected
-        }
-        fileRecyclerView.adapter = fileAdapter
-
-        // INITIALIZE BLUETOOTH MANAGER & ADAPTER
-        bluetoothManager = BluetoothManager(this)
-        bluetoothDeviceAdapter = BluetoothDeviceAdapter(bluetoothDevices)
-
-        bluetoothManager.onDeviceDiscovered = { device ->
-            runOnUiThread {
-                try {
-                    val hasPermission = ActivityCompat.checkSelfPermission(
-                        this,
-                        Manifest.permission.BLUETOOTH_CONNECT
-                    ) == PackageManager.PERMISSION_GRANTED
-                    val name = if (hasPermission) device.name else "Unnamed Device"
-
-                    if (!bluetoothDevices.contains(device)) {
-                        bluetoothDevices.add(device)
-                        bluetoothDeviceAdapter.notifyItemInserted(bluetoothDevices.size - 1)
-
-                        println("Discovered device: $name - ${device.address}")
-                    }
-                } catch (e: SecurityException) {
-                    e.printStackTrace()
-                }
-            }
-        }
-
-        bluetoothManager.onDiscoveryFinished = {
-            runOnUiThread {
-                showBluetoothDevicesPopup()
-            }
-        }
-
-        bluetoothSendFileButton.setOnClickListener {
-            if (selectedFile == null) {
-                Toast.makeText(this, "Please select a file first.", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            bluetoothDevices.clear()
-            bluetoothDeviceAdapter.notifyDataSetChanged()
-            startBluetoothDiscovery()
-
-            Handler(Looper.getMainLooper()).postDelayed({
-                showBluetoothDevicesPopup()
-            }, 2000) // Adjust delay as needed
-        }
-
-        requestFilePermissions() // Call File Access / Permission Request
-
-        /** ----------------------------------------[LAN Section Start]------------------------------------------------------- */
-
-        val lanManager = LanManager(this) // Instantiate LAN manager
-        val lanSendFileButton = findViewById<Button>(R.id.SendFileLanBTN)
-
-        // LAN Send Button logic
-        lanSendFileButton.setOnClickListener {
-            if (selectedFile == null) {
-                Toast.makeText(this, "Please select a file first.", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            val connectivityManager =
-                getSystemService(CONNECTIVITY_SERVICE) as android.net.ConnectivityManager
-            val network = connectivityManager.activeNetwork
-            val capabilities = connectivityManager.getNetworkCapabilities(network)
-
-            val isConnectedToLAN =
-                capabilities?.hasTransport(android.net.NetworkCapabilities.TRANSPORT_WIFI) == true
-
-            if (isConnectedToLAN) {
-                Toast.makeText(this, "Connected to LAN. Sending file...", Toast.LENGTH_SHORT).show()
-
-                // Start LAN server
-                lanManager.startServer { fileName, content ->
-                    runOnUiThread {
-                        Toast.makeText(
-                            this,
-                            "Received: $fileName (${content.size} bytes)",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                    val receivedFile = File(filesDir, fileName)
-                    receivedFile.writeBytes(content)
-                }
-
-                // Send selected file to known LAN IP
-                lanManager.sendFileTo("192.168.1.5", selectedFile!!)
-            } else {
-                Toast.makeText(this, "Not connected to LAN.", Toast.LENGTH_LONG).show()
-            }
-        }
-
-        /** ----------------------------------------[LAN Section End]------------------------------------------------------- */
     }
 }
