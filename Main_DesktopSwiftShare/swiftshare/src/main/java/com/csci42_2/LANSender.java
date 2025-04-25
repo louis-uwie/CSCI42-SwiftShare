@@ -6,7 +6,7 @@ import java.nio.*;
 import java.nio.channels.*;
 import java.nio.charset.StandardCharsets;
 
-public class Sender {
+public class LANSender {
 
     private static final int DISCOVERY_PORT = 8888;
     private static final int TCP_PORT = 9999;
@@ -15,7 +15,7 @@ public class Sender {
     private static final int TIMEOUT = 5000; // ms
 
     public static void main(String[] args) {
-        new Sender().start();
+        new LANSender().start();
     }
 
     public void start() {

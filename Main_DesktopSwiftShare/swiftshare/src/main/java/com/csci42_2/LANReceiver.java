@@ -6,7 +6,7 @@ import java.nio.*;
 import java.nio.channels.*;
 import java.nio.charset.StandardCharsets;
 
-public class Receiver {
+public class LANReceiver {
 
     private static final int DISCOVERY_PORT = 8888;
     private static final int TCP_PORT = 9999;
@@ -14,7 +14,7 @@ public class Receiver {
     private static final String ACK_MESSAGE = "ACK_FILESHARE";
 
     public static void main(String[] args) {
-        new Receiver().start();
+        new LANReceiver().start();
     }
 
     public void start() {
