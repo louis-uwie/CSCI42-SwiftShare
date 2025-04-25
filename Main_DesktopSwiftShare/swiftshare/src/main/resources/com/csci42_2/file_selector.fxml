@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.csci42_2.controller.FileSelectorController"
+      alignment="CENTER"
+      spacing="20">
+
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20"/>
+    </padding>
+
+    <Label text="📁 Choose a File to Send" style="-fx-font-size: 18px;"/>
+
+    <Label fx:id="fileLabel" text="No file selected" wrapText="true" maxWidth="300" />
+    
+    <Button fx:id="browseButton" text="Browse..." prefWidth="200" />
+    <Button fx:id="nextButton" text="Next" prefWidth="200" disable="true" />
+    <Button fx:id="backButton" text="⬅ Back" prefWidth="200" />
+
+</VBox>

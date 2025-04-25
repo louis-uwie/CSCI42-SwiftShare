@@ -47,7 +47,7 @@
                         <!-- Usage: mvn clean javafx:run -->
                         <id>default-cli</id>
                         <configuration>
-                            <mainClass>com.csci42_2.App</mainClass>
+                            <mainClass>com.csci42_2.MainApp</mainClass>
                         </configuration>
                     </execution>
                 </executions>
