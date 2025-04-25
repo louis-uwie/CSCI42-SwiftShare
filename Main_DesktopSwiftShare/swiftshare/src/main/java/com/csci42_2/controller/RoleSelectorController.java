@@ -8,7 +8,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-public class RoleSelectController {
+public class RoleSelectorController {
 
     @FXML private Button sendButton;
     @FXML private Button receiveButton;
