@@ -1,0 +1,10 @@
+com\csci42_2\controller\SenderController$1.class
+com\csci42_2\network\LANConnector.class
+com\csci42_2\LANReceiver.class
+com\csci42_2\controller\RoleSelectController.class
+com\csci42_2\MainApp.class
+module-info.class
+com\csci42_2\controller\SenderController.class
+com\csci42_2\network\LANDiscoverer.class
+com\csci42_2\FileExplorer.class
+com\csci42_2\util\Constants.class

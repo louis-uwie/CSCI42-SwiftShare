@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>  <!-- gotta import this for inside margins -->
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.csci42_2.controller.SenderController"
+      spacing="15"
+      alignment="TOP_CENTER">
+
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20"/>
+    </padding>
+
+    <Label text="📡 File Share - Sender" style="-fx-font-size: 20px; -fx-font-weight: bold;" />
+
+    <Button fx:id="scanButton" text="🔍 Scan for Devices" prefWidth="200" />
+
+    <ListView fx:id="deviceListView" prefHeight="200" prefWidth="300" />
+
+    <Button fx:id="connectButton" text="🔗 Connect to Selected" prefWidth="200" disable="true" />
+
+</VBox>
