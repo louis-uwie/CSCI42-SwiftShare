@@ -70,6 +70,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="0dp"
         android:text="Send File via BT"
+        android:backgroundTint="#33415C"
         app:layout_constraintTop_toBottomOf="@id/contentContainer"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
@@ -80,6 +81,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
         android:text="Send File via LAN"
+        android:backgroundTint="#33415C"
         app:layout_constraintTop_toBottomOf="@id/SendFileBTN"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
