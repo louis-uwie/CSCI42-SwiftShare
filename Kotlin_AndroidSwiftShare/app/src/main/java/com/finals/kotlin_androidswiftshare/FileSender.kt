@@ -10,6 +10,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.webkit.MimeTypeMap
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
@@ -124,14 +125,22 @@ class FileSender : AppCompatActivity() {
         filePickerLauncher.launch(arrayOf("application/pdf", "image/jpeg", "image/png", "text/plain"))
     }
 
-    private fun createLocalCopyFromUri(uri: Uri, fileName: String): File? {
+    private fun createLocalCopyFromUri(uri: Uri, originalName: String): File? {
         return try {
-            val file = File(cacheDir, fileName)
-            val inputStream: InputStream? = contentResolver.openInputStream(uri)
-            val outputStream = FileOutputStream(file)
-            inputStream?.copyTo(outputStream)
-            inputStream?.close()
-            outputStream.close()
+            val mimeType = contentResolver.getType(uri) ?: "application/octet-stream"
+            val extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType) ?: "bin"
+
+            val safeName = originalName
+                .substringAfterLast('/')
+                .substringBeforeLast('.')
+                .replace(Regex("[^a-zA-Z0-9_-]"), "_") + "." + extension
+
+            val file = File(cacheDir, safeName)
+            contentResolver.openInputStream(uri)?.use { input ->
+                FileOutputStream(file).use { output ->
+                    input.copyTo(output)
+                }
+            }
             file
         } catch (e: Exception) {
             e.printStackTrace()
