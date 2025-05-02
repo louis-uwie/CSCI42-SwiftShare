@@ -25,7 +25,7 @@ import java.io.InputStream
 
 class FileSender : AppCompatActivity() {
 
-    private lateinit var fileRecyclerView: RecyclerView
+    private lateinit var deviceRecyclerView: RecyclerView
     private lateinit var previewTextView: TextView
     private lateinit var bluetoothManager: BluetoothManager
     private lateinit var bluetoothDeviceAdapter: BluetoothDeviceAdapter
@@ -62,17 +62,17 @@ class FileSender : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_file_sender)
 
-        fileRecyclerView = findViewById(R.id.fileRecyclerView)
+        deviceRecyclerView = findViewById(R.id.deviceRecyclerView)
         previewTextView = findViewById(R.id.filePreview)
         val bluetoothSendFileButton = findViewById<Button>(R.id.SendFileBTN)
         val lanSendFileButton = findViewById<Button>(R.id.SendFileLanBTN)
 
-        fileRecyclerView.layoutManager = LinearLayoutManager(this)
+        deviceRecyclerView.layoutManager = LinearLayoutManager(this)
         val fileAdapter = FileAdapter(fileList) { selected ->
             previewTextView.text = "Preview: ${selected.name}"
             selectedFile = selected
         }
-        fileRecyclerView.adapter = fileAdapter
+        deviceRecyclerView.adapter = fileAdapter
 
         bluetoothManager = BluetoothManager(this)
         bluetoothDeviceAdapter = BluetoothDeviceAdapter(bluetoothDevices)
@@ -198,7 +198,7 @@ class FileSender : AppCompatActivity() {
             Toast.makeText(this, "No supported files found. Try uploading PDFs, images, or documents.", Toast.LENGTH_SHORT).show()
         }
 
-        fileRecyclerView.adapter?.notifyDataSetChanged()
+        deviceRecyclerView.adapter?.notifyDataSetChanged()
     }
 
     private fun createLocalCopyFromUri(uri: Uri, fileName: String): File? {
