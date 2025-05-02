@@ -5,6 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#F8F8F8"
     tools:context=".MainActivity">
 
     <TextView
@@ -20,6 +21,7 @@
         android:textSize="60sp"
         android:textStyle="bold"
         android:typeface="normal"
+        android:textColor="#285480"
         app:layout_constraintBottom_toTopOf="@+id/welcomeTV"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -32,40 +34,28 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:text="Welcome!"
+        android:textStyle="italic"
+        android:textColor="#C4AEA3"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.285" />
 
-    <!-- Locate File Button -->
+    <!-- Select File Button -->
     <Button
-        android:id="@+id/LocateFileBTN"
+        android:id="@+id/SelectFileBTN"
         android:layout_width="150dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="350dp"
         android:layout_marginBottom="4dp"
-        android:text="Locate File"
-        android:backgroundTint="#33415C"
+        android:text="Select File"
+        android:backgroundTint="#285480"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintVertical_bias="0.971"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/deviceDiscovery"
         app:layout_constraintTop_toBottomOf="@+id/appheaderTV" />
 
-    <!-- Start Discovery Button -->
-    <Button
-        android:id="@+id/deviceDiscovery"
-        android:layout_width="150dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="4dp"
-        android:text="Start Discovery"
-        android:backgroundTint="#33415C"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintVertical_bias="0.971"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/LocateFileBTN" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
