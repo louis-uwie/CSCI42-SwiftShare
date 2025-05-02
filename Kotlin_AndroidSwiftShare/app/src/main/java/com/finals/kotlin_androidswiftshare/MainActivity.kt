@@ -88,9 +88,11 @@ class MainActivity : AppCompatActivity() {
                 intArrayOf(
                     Color.parseColor("#1E3A5A"),
                     Color.parseColor("#285480"),
-                    Color.parseColor("#4C6F8C")
+                    Color.parseColor("#A7BED3"),
+                    Color.parseColor("#285480"),
+                    Color.parseColor("#1E3A5A")
                 ),
-                floatArrayOf(0f, 0.5f, 1f),
+                floatArrayOf(0f, 0.25f, 0.5f, 0.75f, 1f),
                 Shader.TileMode.CLAMP
             )
             textView.paint.shader = shader
