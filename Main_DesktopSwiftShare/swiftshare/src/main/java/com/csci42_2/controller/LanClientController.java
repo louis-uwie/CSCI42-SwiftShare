@@ -13,7 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-public class SenderController {
+public class LanClientController {
 
     @FXML private Button scanButton;
     @FXML private Button connectButton;
@@ -40,7 +40,7 @@ public class SenderController {
         scanButton.setOnAction(e -> scanForDevices());
         connectButton.setOnAction(e -> connectToDevice());
         cancelButton.setOnAction(e -> cancelScan());
-        backButton.setOnAction(e -> backToFiles());
+        backButton.setOnAction(e -> backToTransfer());
     }
 
     private void scanForDevices() {
@@ -98,9 +98,13 @@ public class SenderController {
         deviceListView.getItems().add("Discovery cancelled.");
     }
 
-    private void backToFiles() {
+    private void backToTransfer() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/csci42_2/file_selector.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/csci42_2/transfer_selector.fxml"));
+            
+            TransferSelectorController controller = loader.getController();
+            controller.setSelectedFile(selectedFile);
+            
             Scene scene = new Scene(loader.load());
             Stage stage = (Stage) backButton.getScene().getWindow();
             stage.setScene(scene);

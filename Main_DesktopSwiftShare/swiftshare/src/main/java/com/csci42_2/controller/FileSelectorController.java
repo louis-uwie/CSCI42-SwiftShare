@@ -21,7 +21,7 @@ public class FileSelectorController {
     @FXML
     public void initialize() {
         browseButton.setOnAction(e -> browseFile());
-        nextButton.setOnAction(e -> goToDiscovery());
+        nextButton.setOnAction(e -> goToTransfer());
         backButton.setOnAction(e -> goBack());
     }
 
@@ -39,17 +39,17 @@ public class FileSelectorController {
         }
     }
 
-    private void goToDiscovery() {
+    private void goToTransfer() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/csci42_2/sender.fxml"));
-            Scene senderScene = new Scene(loader.load());
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/csci42_2/transfer_selector.fxml"));
+            Scene transferScene = new Scene(loader.load());
 
             // Pass file to SenderController
-            SenderController controller = loader.getController();
+            TransferSelectorController controller = loader.getController();
             controller.setSelectedFile(selectedFile);
 
             Stage stage = (Stage) nextButton.getScene().getWindow();
-            stage.setScene(senderScene);
+            stage.setScene(transferScene);
         } catch (IOException e) {
             e.printStackTrace();
         }
