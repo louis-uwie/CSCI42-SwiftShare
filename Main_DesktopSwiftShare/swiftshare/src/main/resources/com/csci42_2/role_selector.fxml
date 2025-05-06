@@ -16,7 +16,7 @@
 
     <Label text="📁 SwiftShare" style="-fx-font-size: 20px; -fx-font-weight: bold;" />
 
-    <Button fx:id="sendButton" text="Send a File" prefWidth="150" />
-    <Button fx:id="receiveButton" text="Receive a File" prefWidth="150" />
+    <Button fx:id="sendButton" text="Send a File" prefWidth="150" style="-fx-background-color: #526aff; -fx-font-weight: bold; -fx-text-fill: white;" />
+    <Button fx:id="receiveButton" text="Receive a File" prefWidth="150" style="-fx-background-color:transparent; -fx-border-radius:3; -fx-border-color:#526aff; -fx-border-width: 1 1 1 1; -fx-font-weight: bold; -fx-text-fill:#526aff;" />
 
 </VBox>

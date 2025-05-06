@@ -5,4 +5,7 @@ module com.csci42_2 {
 
     opens com.csci42_2 to javafx.fxml;
     exports com.csci42_2;
+
+    opens com.csci42_2.controller to javafx.fxml;
+    exports com.csci42_2.controller; 
 }

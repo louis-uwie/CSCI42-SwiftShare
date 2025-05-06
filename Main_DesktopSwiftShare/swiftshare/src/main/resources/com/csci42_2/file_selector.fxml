@@ -18,8 +18,8 @@
 
     <Label fx:id="fileLabel" text="No file selected" wrapText="true" maxWidth="300" />
     
-    <Button fx:id="browseButton" text="Browse..." prefWidth="200" />
-    <Button fx:id="nextButton" text="Next" prefWidth="200" disable="true" />
-    <Button fx:id="backButton" text="⬅ Back" prefWidth="200" />
+    <Button fx:id="browseButton" text="Browse..." prefWidth="200" style="-fx-background-color: #526aff; -fx-font-weight: bold; -fx-text-fill: white;" />
+    <Button fx:id="nextButton" text="Next" prefWidth="200" disable="true" style="-fx-background-color:transparent; -fx-border-radius:3; -fx-border-color:#526aff; -fx-border-width: 1 1 1 1; -fx-font-weight: bold; -fx-text-fill:#526aff;" />
+    <Button fx:id="backButton" text="⬅ Back" prefWidth="200" style="-fx-background-color:transparent; -fx-border-radius:3; -fx-border-color:#526aff; -fx-border-width: 1 1 1 1; -fx-font-weight: bold; -fx-text-fill:#526aff;" />
 
 </VBox>
