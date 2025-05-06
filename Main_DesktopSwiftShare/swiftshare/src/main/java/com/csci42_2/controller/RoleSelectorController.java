@@ -16,7 +16,7 @@ public class RoleSelectorController {
     @FXML
     public void initialize() {
         sendButton.setOnAction(e -> loadScene("/com/csci42_2/file_selector.fxml"));
-        receiveButton.setOnAction(e -> loadScene("/com/csci42_2/receiver.fxml")); // placeholder
+        receiveButton.setOnAction(e -> loadScene("/com/csci42_2/server_selector.fxml")); // placeholder
     }
 
     private void loadScene(String fxmlPath) {

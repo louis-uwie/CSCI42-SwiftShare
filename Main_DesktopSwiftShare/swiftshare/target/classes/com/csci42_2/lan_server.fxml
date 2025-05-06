@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.csci42_2.controller.LANReceiverController"
+      spacing="15"
+      alignment="TOP_CENTER">
+
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20"/>
+    </padding>
+
+    <Label text="📡 File Share - Receiver" style="-fx-font-size: 20px; -fx-font-weight: bold;" />
+    
+    <Button fx:id="startListeningButton" text="📡 Start Listening for LAN" prefWidth="250" />
+    <Label fx:id="statusLabel" text="Status: Not Listening" />
+    
+    <TextArea fx:id="logArea" prefHeight="200" prefWidth="400" wrapText="true" editable="false" />
+    
+    <Button fx:id="backButton" text="⬅ Back" prefWidth="200" />
+
+</VBox>

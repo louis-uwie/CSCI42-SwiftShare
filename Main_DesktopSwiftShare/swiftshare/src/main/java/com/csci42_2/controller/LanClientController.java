@@ -40,7 +40,7 @@ public class LANClientController {
         scanButton.setOnAction(e -> scanForDevices());
         connectButton.setOnAction(e -> connectToDevice());
         cancelButton.setOnAction(e -> cancelScan());
-        backButton.setOnAction(e -> backToTransfer());
+        backButton.setOnAction(e -> backToClient());
     }
 
     private void scanForDevices() {
@@ -98,14 +98,16 @@ public class LANClientController {
         deviceListView.getItems().add("Discovery cancelled.");
     }
 
-    private void backToTransfer() {
+    private void backToClient() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/csci42_2/transfer_selector.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/csci42_2/client_selector.fxml"));
             
-            TransferSelectorController controller = loader.getController();
-            controller.setSelectedFile(selectedFile);
-
+            // Load FXML and THEN get the controller
             Scene scene = new Scene(loader.load());
+            ClientSelectorController controller = loader.getController();
+            
+            controller.setSelectedFile(selectedFile);
+    
             Stage stage = (Stage) backButton.getScene().getWindow();
             stage.setScene(scene);
         } catch (IOException e) {
