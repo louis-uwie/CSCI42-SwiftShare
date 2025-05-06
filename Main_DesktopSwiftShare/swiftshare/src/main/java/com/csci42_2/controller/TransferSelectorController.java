@@ -33,7 +33,7 @@ public class TransferSelectorController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/csci42_2/lan_client.fxml"));
             Scene scene = new Scene(loader.load());
 
-            LanClientController controller = loader.getController();
+            LANClientController controller = loader.getController();
             controller.setSelectedFile(selectedFile);
 
             Stage stage = (Stage) lanButton.getScene().getWindow();

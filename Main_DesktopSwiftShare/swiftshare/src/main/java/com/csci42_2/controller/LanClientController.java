@@ -13,7 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-public class LanClientController {
+public class LANClientController {
 
     @FXML private Button scanButton;
     @FXML private Button connectButton;
@@ -104,7 +104,7 @@ public class LanClientController {
             
             TransferSelectorController controller = loader.getController();
             controller.setSelectedFile(selectedFile);
-            
+
             Scene scene = new Scene(loader.load());
             Stage stage = (Stage) backButton.getScene().getWindow();
             stage.setScene(scene);
