@@ -75,7 +75,10 @@ class FileSender : AppCompatActivity() {
         deviceRecyclerView.adapter = fileAdapter
 
         bluetoothManager = BluetoothManager(this)
-        bluetoothDeviceAdapter = BluetoothDeviceAdapter(bluetoothDevices)
+        bluetoothDeviceAdapter = BluetoothDeviceAdapter(bluetoothDevices) { device ->
+            Toast.makeText(this, "Selected: ${device.name}", Toast.LENGTH_SHORT).show()
+        }
+
 
         bluetoothManager.onDeviceDiscovered = { device ->
             runOnUiThread {
