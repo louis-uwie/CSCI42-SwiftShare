@@ -11,6 +11,8 @@ import java.nio.charset.StandardCharsets;
 public class LANServer {
 
     private volatile boolean running = false;
+    private DatagramChannel udpChannel;
+    private ServerSocketChannel tcpChannel;
 
     public void log(String message) {
         System.out.println(message);
@@ -25,16 +27,25 @@ public class LANServer {
     public void stop() {
         running = false;
         log("🔴 Stopped listening.");
+    
+        try {
+            if (udpChannel != null && udpChannel.isOpen()) udpChannel.close();
+            if (tcpChannel != null && tcpChannel.isOpen()) tcpChannel.close();
+        } catch (IOException e) {
+            log("⚠️ Error closing channels: " + e.getMessage());
+        }
     }
+    
 
     private void startUDPListener() {
         try (DatagramChannel channel = DatagramChannel.open()) {
+            udpChannel = channel;
             channel.setOption(StandardSocketOptions.SO_REUSEADDR, true);
             channel.bind(new InetSocketAddress(Constants.DISCOVERY_PORT));
             log("📡 UDP listening on port " + Constants.DISCOVERY_PORT);
-
+    
             ByteBuffer buffer = ByteBuffer.allocate(1024);
-
+    
             while (running) {
                 buffer.clear();
                 SocketAddress sender = channel.receive(buffer);
@@ -49,15 +60,17 @@ public class LANServer {
                         log("✅ Discovery message received, ACK sent to " + sender);
                     }
                 }
-                Thread.sleep(100); // prevent tight loop
+                Thread.sleep(100);
             }
         } catch (IOException | InterruptedException e) {
             if (running) log("❌ UDP Error: " + e.getMessage());
         }
     }
+    
 
     private void startTCPServer() {
         try (ServerSocketChannel serverChannel = ServerSocketChannel.open()) {
+            tcpChannel = serverChannel;
             serverChannel.bind(new InetSocketAddress(Constants.TCP_PORT));
             log("📥 TCP Server listening on port " + Constants.TCP_PORT);
     
