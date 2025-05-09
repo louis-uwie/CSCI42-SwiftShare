@@ -1,14 +1,15 @@
 C:\Users\Paco Zabala\Documents\5th year\2nd Sem\Github Repos\CSCI42-SwiftShare\Main_DesktopSwiftShare\swiftshare\src\main\java\com\csci42_2\controller\ServerSelectorController.java
 C:\Users\Paco Zabala\Documents\5th year\2nd Sem\Github Repos\CSCI42-SwiftShare\Main_DesktopSwiftShare\swiftshare\src\main\java\com\csci42_2\FileExplorer.java
+C:\Users\Paco Zabala\Documents\5th year\2nd Sem\Github Repos\CSCI42-SwiftShare\Main_DesktopSwiftShare\swiftshare\src\main\java\com\csci42_2\network\LANServer.java
 C:\Users\Paco Zabala\Documents\5th year\2nd Sem\Github Repos\CSCI42-SwiftShare\Main_DesktopSwiftShare\swiftshare\src\main\java\com\csci42_2\network\LANDiscoverer.java
 C:\Users\Paco Zabala\Documents\5th year\2nd Sem\Github Repos\CSCI42-SwiftShare\Main_DesktopSwiftShare\swiftshare\src\main\java\com\csci42_2\MainApp.java
 C:\Users\Paco Zabala\Documents\5th year\2nd Sem\Github Repos\CSCI42-SwiftShare\Main_DesktopSwiftShare\swiftshare\src\main\java\com\csci42_2\controller\FileSelectorController.java
 C:\Users\Paco Zabala\Documents\5th year\2nd Sem\Github Repos\CSCI42-SwiftShare\Main_DesktopSwiftShare\swiftshare\src\main\java\module-info.java
-C:\Users\Paco Zabala\Documents\5th year\2nd Sem\Github Repos\CSCI42-SwiftShare\Main_DesktopSwiftShare\swiftshare\src\main\java\com\csci42_2\controller\LANReceiverController.java
 C:\Users\Paco Zabala\Documents\5th year\2nd Sem\Github Repos\CSCI42-SwiftShare\Main_DesktopSwiftShare\swiftshare\src\main\java\com\csci42_2\network\LANConnector.java
+C:\Users\Paco Zabala\Documents\5th year\2nd Sem\Github Repos\CSCI42-SwiftShare\Main_DesktopSwiftShare\swiftshare\src\main\java\com\csci42_2\util\NetworkUtils.java
 C:\Users\Paco Zabala\Documents\5th year\2nd Sem\Github Repos\CSCI42-SwiftShare\Main_DesktopSwiftShare\swiftshare\src\main\java\com\csci42_2\controller\ClientSelectorController.java
-C:\Users\Paco Zabala\Documents\5th year\2nd Sem\Github Repos\CSCI42-SwiftShare\Main_DesktopSwiftShare\swiftshare\src\main\java\com\csci42_2\network\LANReceiver.java
 C:\Users\Paco Zabala\Documents\5th year\2nd Sem\Github Repos\CSCI42-SwiftShare\Main_DesktopSwiftShare\swiftshare\src\main\java\com\csci42_2\controller\BTClientController.java
 C:\Users\Paco Zabala\Documents\5th year\2nd Sem\Github Repos\CSCI42-SwiftShare\Main_DesktopSwiftShare\swiftshare\src\main\java\com\csci42_2\util\Constants.java
 C:\Users\Paco Zabala\Documents\5th year\2nd Sem\Github Repos\CSCI42-SwiftShare\Main_DesktopSwiftShare\swiftshare\src\main\java\com\csci42_2\controller\LANClientController.java
 C:\Users\Paco Zabala\Documents\5th year\2nd Sem\Github Repos\CSCI42-SwiftShare\Main_DesktopSwiftShare\swiftshare\src\main\java\com\csci42_2\controller\RoleSelectorController.java
+C:\Users\Paco Zabala\Documents\5th year\2nd Sem\Github Repos\CSCI42-SwiftShare\Main_DesktopSwiftShare\swiftshare\src\main\java\com\csci42_2\controller\LANServerController.java

@@ -8,7 +8,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.*;
 import java.nio.charset.StandardCharsets;
 
-public class LANReceiver {
+public class LANServer {
 
     private volatile boolean running = false;
 
@@ -60,19 +60,23 @@ public class LANReceiver {
         try (ServerSocketChannel serverChannel = ServerSocketChannel.open()) {
             serverChannel.bind(new InetSocketAddress(Constants.TCP_PORT));
             log("📥 TCP Server listening on port " + Constants.TCP_PORT);
-
+    
             while (running) {
                 SocketChannel clientChannel = serverChannel.accept();
                 if (clientChannel != null) {
                     log("📶 TCP connection accepted from " + clientChannel.getRemoteAddress());
-
-                    ByteBuffer buffer = ByteBuffer.allocate(1024);
-                    clientChannel.write(ByteBuffer.wrap("Hi from Receiver!".getBytes()));
-                    buffer.clear();
-                    clientChannel.read(buffer);
-                    buffer.flip();
-                    log("📨 Received: " + StandardCharsets.UTF_8.decode(buffer).toString());
-
+    
+                    String hello = NetworkUtils.receiveMessage(clientChannel);
+                    if ("HELLO_RECEIVER".equals(hello)) {
+                        NetworkUtils.sendMessage(clientChannel, "ACK_RECEIVER");
+    
+                        String next = NetworkUtils.receiveMessage(clientChannel);
+                        if ("SEND_FILE".equals(next)) {
+                            String fileStub = NetworkUtils.receiveStubFile(clientChannel);
+                            log("📁 Stub file received: " + fileStub);
+                        }
+                    }
+    
                     clientChannel.close();
                 }
             }

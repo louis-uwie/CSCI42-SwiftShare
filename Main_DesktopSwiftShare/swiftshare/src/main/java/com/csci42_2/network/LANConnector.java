@@ -1,26 +1,30 @@
 package com.csci42_2.network;
 
 import com.csci42_2.util.Constants;
+import com.csci42_2.util.NetworkUtils;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
-import java.nio.charset.StandardCharsets;
 
 public class LANConnector {
 
     public void connectToDevice(String ip) {
         try (SocketChannel channel = SocketChannel.open()) {
             channel.connect(new InetSocketAddress(ip, Constants.TCP_PORT));
-            System.out.println("Connected to " + ip);
+            System.out.println("🌐 Connected to " + ip);
 
-            ByteBuffer buffer = ByteBuffer.allocate(1024);
-            channel.read(buffer);
-            buffer.flip();
-            System.out.println("Received: " + StandardCharsets.UTF_8.decode(buffer).toString());
+            // 1. Confirm identity
+            NetworkUtils.sendMessage(channel, "HELLO_RECEIVER");
+            String response = NetworkUtils.receiveMessage(channel);
+            System.out.println("🗨 Received: " + response);
 
-            channel.write(ByteBuffer.wrap("Hi from Sender!".getBytes()));
+            if ("ACK_RECEIVER".equals(response)) {
+                // 2. Proceed with stub file transfer
+                NetworkUtils.sendMessage(channel, "SEND_FILE");
+                NetworkUtils.sendStubFile(channel);
+                System.out.println("📤 Stub file sent!");
+            }
 
         } catch (IOException e) {
             e.printStackTrace();
