@@ -18,7 +18,6 @@
     <Label text="Choose Transfer Type" style="-fx-font-size: 18px;" />
     
     <Button fx:id="lanButton" text="🌐 LAN Transfer" prefWidth="200" />
-    <Button fx:id="bluetoothButton" text="📶 Bluetooth Transfer" prefWidth="200" />
     <Button fx:id="backButton" text="⬅ Back" prefWidth="200" />
 
 </VBox>

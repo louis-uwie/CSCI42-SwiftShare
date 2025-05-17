@@ -12,7 +12,6 @@ import java.io.IOException;
 public class ClientSelectorController {
 
     @FXML private Button lanButton;
-    @FXML private Button bluetoothButton;
     @FXML private Button backButton;
     @FXML private Label fileLabel;
 
@@ -32,7 +31,6 @@ public class ClientSelectorController {
         }
 
         lanButton.setOnAction(e -> loadLANSender());
-        bluetoothButton.setOnAction(e -> loadBluetoothSender());
         backButton.setOnAction(e -> goBack());
     }
 
@@ -45,21 +43,6 @@ public class ClientSelectorController {
             controller.setSelectedFile(selectedFile);
 
             Stage stage = (Stage) lanButton.getScene().getWindow();
-            stage.setScene(scene);
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-    }
-
-    private void loadBluetoothSender() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/csci42_2/bt_client.fxml"));
-            Scene scene = new Scene(loader.load());
-
-            BTClientController controller = loader.getController();
-            // controller.setSelectedFile(selectedFile); for when the BTClient works better.
-
-            Stage stage = (Stage) bluetoothButton.getScene().getWindow();
             stage.setScene(scene);
         } catch (IOException ex) {
             ex.printStackTrace();

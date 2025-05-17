@@ -11,13 +11,11 @@ import java.io.IOException;
 public class ServerSelectorController {
 
     @FXML private Button lanButton;
-    @FXML private Button bluetoothButton;
     @FXML private Button backButton;
 
     @FXML
     public void initialize() {
         lanButton.setOnAction(e -> loadReceiverScreen("/com/csci42_2/lan_server.fxml"));
-        bluetoothButton.setOnAction(e -> loadReceiverScreen("/com/csci42_2/bluetooth_server.fxml"));
         backButton.setOnAction(e -> goBack());
     }
 
