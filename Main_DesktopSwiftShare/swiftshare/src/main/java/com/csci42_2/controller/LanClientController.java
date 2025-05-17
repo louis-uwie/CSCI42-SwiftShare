@@ -89,11 +89,11 @@ public class LANClientController {
             scanTask.cancel();
         }
 
-        // Reset the UI
+        // reset the UI
         scanButton.setDisable(false);
         backButton.setDisable(false);  // Enable back button after cancellation
 
-        // Clear device list and show cancellation message
+        // clear device list and show cancellation message
         deviceListView.getItems().clear();
         deviceListView.getItems().add("Discovery cancelled.");
     }
@@ -102,7 +102,7 @@ public class LANClientController {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/csci42_2/client_selector.fxml"));
             
-            // Load FXML and THEN get the controller
+            // load FXML and THEN get the controller
             Scene scene = new Scene(loader.load());
             ClientSelectorController controller = loader.getController();
             
