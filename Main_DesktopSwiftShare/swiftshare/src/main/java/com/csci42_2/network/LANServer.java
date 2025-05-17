@@ -85,8 +85,8 @@ public class LANServer {
     
                         String next = NetworkUtils.receiveMessage(clientChannel);
                         if ("SEND_FILE".equals(next)) {
-                            String fileStub = NetworkUtils.receiveStubFile(clientChannel);
-                            log("📁 Stub file received: " + fileStub);
+                            NetworkUtils.receiveFile(clientChannel, Constants.RECEIVE_DIR);
+                            log("📂 File saved to " + Constants.RECEIVE_DIR);
                         }
                     }
     

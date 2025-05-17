@@ -7,4 +7,6 @@ public class Constants {
 
     public static final String DISCOVERY_MESSAGE = "HELLO_FILESHARE";
     public static final String ACK_MESSAGE = "ACK_FILESHARE";
+    public static final String RECEIVE_DIR = System.getProperty("user.home") + "/Downloads/SwiftShare_ReceivedFiles";
+
 }

@@ -73,7 +73,7 @@ public class LANClientController {
     private void connectToDevice() {
         String ip = deviceListView.getSelectionModel().getSelectedItem();
         if (ip != null) {
-            new Thread(() -> connector.connectToDevice(ip)).start();
+            new Thread(() -> connector.connectToDevice(ip, selectedFile)).start();
         }
     }
 

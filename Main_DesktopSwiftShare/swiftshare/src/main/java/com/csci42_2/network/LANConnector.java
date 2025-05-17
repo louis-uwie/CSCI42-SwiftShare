@@ -4,12 +4,13 @@ import com.csci42_2.util.Constants;
 import com.csci42_2.util.NetworkUtils;
 
 import java.io.IOException;
+import java.io.File;
 import java.net.InetSocketAddress;
 import java.nio.channels.SocketChannel;
 
 public class LANConnector {
 
-    public void connectToDevice(String ip) {
+    public void connectToDevice(String ip, File file) {
         try (SocketChannel channel = SocketChannel.open()) {
             channel.connect(new InetSocketAddress(ip, Constants.TCP_PORT));
             System.out.println("🌐 Connected to " + ip);
@@ -20,9 +21,9 @@ public class LANConnector {
             System.out.println("🗨 Received: " + response);
 
             if ("ACK_RECEIVER".equals(response)) {
-                // 2. Proceed with stub file transfer
+                // 2. Proceed with file transfer
                 NetworkUtils.sendMessage(channel, "SEND_FILE");
-                NetworkUtils.sendStubFile(channel);
+                NetworkUtils.sendFile(channel, file);
                 System.out.println("📤 Stub file sent!");
             }
 
