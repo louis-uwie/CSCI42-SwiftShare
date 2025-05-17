@@ -10,7 +10,7 @@ public class NetworkUtils {
 
     private static final int BUFFER_SIZE = 1024;
 
-    // Text message utilities
+    // text message utilities
     public static void sendMessage(SocketChannel channel, String message) throws IOException {
         ByteBuffer buffer = ByteBuffer.wrap((message + "\n").getBytes(StandardCharsets.UTF_8));
         channel.write(buffer);
@@ -23,12 +23,12 @@ public class NetworkUtils {
         return StandardCharsets.UTF_8.decode(buffer).toString().trim();
     }
 
-    // Real file transfer logic
+    // real file transfer logic
     public static void sendFile(SocketChannel channel, File file) throws IOException {
         String fileName = file.getName();
         long fileSize = file.length();
 
-        // Header: [filename length][filename][file size]
+        // header: [filename length][filename][file size]
         ByteBuffer header = ByteBuffer.allocate(4 + fileName.getBytes().length + 8);
         header.putInt(fileName.getBytes().length);
         header.put(fileName.getBytes());
@@ -36,7 +36,7 @@ public class NetworkUtils {
         header.flip();
         channel.write(header);
 
-        // Body: file content
+        // body: file content
         try (FileInputStream fis = new FileInputStream(file)) {
             FileChannel fileChannel = fis.getChannel();
             long position = 0;
