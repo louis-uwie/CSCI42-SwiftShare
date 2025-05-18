@@ -31,7 +31,7 @@ class FileSender : AppCompatActivity() {
     private lateinit var bluetoothManager: BluetoothManager
     private lateinit var bluetoothDeviceAdapter: BluetoothDeviceAdapter
     private val fileList = mutableListOf<File>()
-    private val bluetoothDevices = mutableListOf<BluetoothDevice>()
+//    private val bluetoothDevices = mutableListOf<BluetoothDevice>()
     private var selectedFile: File? = null
 
     /**
@@ -119,12 +119,13 @@ class FileSender : AppCompatActivity() {
 
         // INITIALIZE BLUETOOTH LOGIC
         bluetoothManager = BluetoothManager(this)
-        bluetoothDeviceAdapter = BluetoothDeviceAdapter(bluetoothDevices) { device ->
+        bluetoothDeviceAdapter = BluetoothDeviceAdapter(bluetoothManager.getDiscoveredDevices()) { device ->
             selectedFile?.let { file ->
                 val fileUri = Uri.fromFile(file)
                 bluetoothManager.sendFileToDevice(device, fileUri, ::onBluetoothSendComplete)
             } ?: Toast.makeText(this, "No file selected to send.", Toast.LENGTH_SHORT).show()
         }
+
 
         val selectFileButton = findViewById<Button>(R.id.SelectFileBTN2)
         selectFileButton.setOnClickListener {
@@ -135,20 +136,13 @@ class FileSender : AppCompatActivity() {
         }
 
 
-        bluetoothManager.onDeviceDiscovered = { device ->
+        bluetoothManager.onDeviceDiscovered = {
             runOnUiThread {
-                val hasPermission = ActivityCompat.checkSelfPermission(
-                    this, Manifest.permission.BLUETOOTH_CONNECT
-                ) == PackageManager.PERMISSION_GRANTED
-                val name = if (hasPermission) device.name else "Unnamed Device"
-
-                if (!bluetoothDevices.contains(device)) {
-                    bluetoothDevices.add(device)
-                    bluetoothDeviceAdapter.notifyItemInserted(bluetoothDevices.size - 1)
-                    println("Discovered device: $name - ${device.address}")
-                }
+                bluetoothDeviceAdapter.notifyDataSetChanged()
             }
         }
+
+
 
         bluetoothManager.onDiscoveryFinished = {
             runOnUiThread { showBluetoothDevicesPopup() }
@@ -161,7 +155,7 @@ class FileSender : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            bluetoothDevices.clear()
+//            bluetoothDevices.clear()
             bluetoothDeviceAdapter.notifyDataSetChanged()
 
             startBluetoothDiscovery()
@@ -279,6 +273,15 @@ class FileSender : AppCompatActivity() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_bluetooth_devices, null)
         val recyclerView = dialogView.findViewById<RecyclerView>(R.id.deviceRecyclerView)
         recyclerView.layoutManager = LinearLayoutManager(this)
+
+        // Always get updated list from manager
+        bluetoothDeviceAdapter = BluetoothDeviceAdapter(bluetoothManager.getDiscoveredDevices()) { device ->
+            selectedFile?.let { file ->
+                val fileUri = Uri.fromFile(file)
+                bluetoothManager.sendFileToDevice(device, fileUri, ::onBluetoothSendComplete)
+            } ?: Toast.makeText(this, "No file selected to send.", Toast.LENGTH_SHORT).show()
+        }
+
         recyclerView.adapter = bluetoothDeviceAdapter
 
         val dialog = AlertDialog.Builder(this)
@@ -289,6 +292,7 @@ class FileSender : AppCompatActivity() {
 
         dialog.show()
     }
+
 
     /**
      * HANDLE BLUETOOTH DEVICE DISCOVERY & PERMISSIONS

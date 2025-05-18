@@ -26,6 +26,8 @@ class BluetoothManager(private val context: Context) {
     private val bluetoothAdapter: BluetoothAdapter? = BluetoothAdapter.getDefaultAdapter()
     private val discoveredDevices = mutableListOf<BluetoothDevice>()
 
+    fun getDiscoveredDevices(): List<BluetoothDevice> = discoveredDevices
+
     var onDeviceDiscovered: ((BluetoothDevice) -> Unit)? = null
     var onDiscoveryFinished: (() -> Unit)? = null
 
@@ -49,6 +51,7 @@ class BluetoothManager(private val context: Context) {
                             discoveredDevices.add(it)
                             onDeviceDiscovered?.invoke(it)
                         }
+
                     } ?: Log.d("BluetoothManager", "Device found but is null.")
                 }
 
