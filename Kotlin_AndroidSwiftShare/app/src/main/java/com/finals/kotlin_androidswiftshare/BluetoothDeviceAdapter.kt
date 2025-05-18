@@ -37,6 +37,7 @@ class BluetoothDeviceAdapter(
         return DeviceViewHolder(view)
     }
 
+    @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
     override fun onBindViewHolder(holder: DeviceViewHolder, position: Int) {
         val device = devices[position]
         val name = device.name ?: device.address ?: "Unknown Device"
