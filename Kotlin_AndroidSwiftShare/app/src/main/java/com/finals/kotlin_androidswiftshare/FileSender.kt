@@ -41,14 +41,30 @@ class FileSender : AppCompatActivity() {
         ActivityResultContracts.OpenDocument()
     ) { uri: Uri? ->
         uri?.let {
-            val fileName = uri.lastPathSegment?.substringAfterLast('/') ?: "document"
+            val fileName = getFileNameFromUri(uri) ?: "document"
             val file = createLocalCopyFromUri(uri, fileName)
             if (file != null) {
-                previewTextView.text = "Preview: ${fileName}"
+                previewTextView.text = "Preview: $fileName"
                 selectedFile = file
             }
         }
     }
+
+    private fun getFileNameFromUri(uri: Uri): String? {
+        var name: String? = null
+        val cursor = contentResolver.query(uri, null, null, null, null)
+        cursor?.use {
+            if (it.moveToFirst()) {
+                val nameIndex = it.getColumnIndex(android.provider.OpenableColumns.DISPLAY_NAME)
+                if (nameIndex != -1) {
+                    name = it.getString(nameIndex)
+                }
+            }
+        }
+        return name
+    }
+
+
 
     /**
      * Requests Bluetooth-related permissions.
@@ -88,7 +104,6 @@ class FileSender : AppCompatActivity() {
 
         previewTextView = findViewById(R.id.filePreview)
         val bluetoothSendFileButton = findViewById<Button>(R.id.SendFileBTN)
-//        val lanSendFileButton = findViewById<Button>(R.id.SendFileLanBTN)
         deviceRecyclerView = findViewById(R.id.deviceRecyclerView)
         deviceRecyclerView.layoutManager = LinearLayoutManager(this)
 
@@ -125,15 +140,38 @@ class FileSender : AppCompatActivity() {
         }
 
         // HANDLE BLUETOOTH SEND BUTTON
+
+        var isDiscovering = false
+
         bluetoothSendFileButton.setOnClickListener {
-            if (selectedFile == null) {
-                Toast.makeText(this, "Please select a file first.", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
+            if (!isDiscovering) {
+                if (selectedFile == null) {
+                    Toast.makeText(this, "Please select a file first.", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+
+                // Start discovery
+                bluetoothDevices.clear()
+                bluetoothDeviceAdapter.notifyDataSetChanged()
+                startBluetoothDiscoveryLoop()
+
+                isDiscovering = true
+                bluetoothSendFileButton.text = "Cancel"
+
+            } else {
+                // Cancel discovery and cleanup
+                bluetoothManager.stopDiscovery()
+                discoveryHandler?.removeCallbacksAndMessages(null)
+
+                bluetoothDevices.clear()
+                bluetoothDeviceAdapter.notifyDataSetChanged()
+
+                isDiscovering = false
+                bluetoothSendFileButton.text = "Send File via Bluetooth"
             }
-            bluetoothDevices.clear()
-            bluetoothDeviceAdapter.notifyDataSetChanged()
-            startBluetoothDiscoveryLoop()
         }
+
+
 
         // OPEN FILE PICKER
         filePickerLauncher.launch(arrayOf("application/pdf", "image/jpeg", "image/png", "text/plain"))

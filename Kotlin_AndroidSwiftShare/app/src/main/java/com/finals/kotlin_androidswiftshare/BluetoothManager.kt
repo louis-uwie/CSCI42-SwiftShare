@@ -161,93 +161,93 @@ class BluetoothManager(private val context: Context) {
 
     private val APP_UUID: UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB")
 
-    @SuppressLint("MissingPermission")
-    fun sendFileToDevice(
-        device: BluetoothDevice,
-        fileUri: Uri,
-        onComplete: (success: Boolean, error: String?) -> Unit
-    ) {
-        thread {
-            try {
-                val socket = device.createRfcommSocketToServiceRecord(APP_UUID)
-                bluetoothAdapter?.cancelDiscovery()
-                socket.connect()
-
-                val outputStream: OutputStream = socket.outputStream
-                val inputStream = context.contentResolver.openInputStream(fileUri)
-
-                if (inputStream == null) {
-                    onComplete(false, "File input stream is null")
-                    socket.close()
-                    return@thread
-                }
-
-                val buffer = ByteArray(1024)
-                var bytesRead: Int
-
-                while (inputStream.read(buffer).also { bytesRead = it } != -1) {
-                    outputStream.write(buffer, 0, bytesRead)
-                }
-
-                outputStream.flush()
-                inputStream.close()
-                socket.close()
-
-                onComplete(true, null)
-            } catch (e: Exception) {
-                Log.e("BluetoothClient", "Error sending file", e)
-                onComplete(false, e.message)
-            }
-        }
-    }
+//    @SuppressLint("MissingPermission")
+//    fun sendFileToDevice(
+//        device: BluetoothDevice,
+//        fileUri: Uri,
+//        onComplete: (success: Boolean, error: String?) -> Unit
+//    ) {
+//        thread {
+//            try {
+//                val socket = device.createRfcommSocketToServiceRecord(APP_UUID)
+//                bluetoothAdapter?.cancelDiscovery()
+//                socket.connect()
+//
+//                val outputStream: OutputStream = socket.outputStream
+//                val inputStream = context.contentResolver.openInputStream(fileUri)
+//
+//                if (inputStream == null) {
+//                    onComplete(false, "File input stream is null")
+//                    socket.close()
+//                    return@thread
+//                }
+//
+//                val buffer = ByteArray(1024)
+//                var bytesRead: Int
+//
+//                while (inputStream.read(buffer).also { bytesRead = it } != -1) {
+//                    outputStream.write(buffer, 0, bytesRead)
+//                }
+//
+//                outputStream.flush()
+//                inputStream.close()
+//                socket.close()
+//
+//                onComplete(true, null)
+//            } catch (e: Exception) {
+//                Log.e("BluetoothClient", "Error sending file", e)
+//                onComplete(false, e.message)
+//            }
+//        }
+//    }
 
 
     /**
      * Sends a file (via File object) to a paired Bluetooth device.
      * This is useful when SAF returns a File path instead of content Uri.
      */
-    @SuppressLint("MissingPermission")
-    fun sendFileTo(
-        device: BluetoothDevice,
-        file: File,
-        onComplete: (success: Boolean, error: String?) -> Unit
-    ) {
-        thread {
-            try {
-                if (device.bondState != BluetoothDevice.BOND_BONDED) {
-                    onComplete(false, "Device is not paired. Please pair first.")
-                    return@thread
-                }
-
-                bluetoothAdapter?.cancelDiscovery()
-
-                // Create socket securely
-                val socket = device.createRfcommSocketToServiceRecord(APP_UUID)
-
-                socket.connect()
-
-                val outputStream: OutputStream = socket.outputStream
-                val inputStream = file.inputStream()
-
-                val buffer = ByteArray(1024)
-                var bytesRead: Int
-
-                while (inputStream.read(buffer).also { bytesRead = it } != -1) {
-                    outputStream.write(buffer, 0, bytesRead)
-                }
-
-                outputStream.flush()
-                inputStream.close()
-                socket.close()
-
-                onComplete(true, null)
-
-            } catch (e: Exception) {
-                Log.e("BluetoothClient", "Error sending file", e)
-                onComplete(false, e.message)
-            }
-        }
-    }
+//    @SuppressLint("MissingPermission")
+//    fun sendFileTo(
+//        device: BluetoothDevice,
+//        file: File,
+//        onComplete: (success: Boolean, error: String?) -> Unit
+//    ) {
+//        thread {
+//            try {
+//                if (device.bondState != BluetoothDevice.BOND_BONDED) {
+//                    onComplete(false, "Device is not paired. Please pair first.")
+//                    return@thread
+//                }
+//
+//                bluetoothAdapter?.cancelDiscovery()
+//
+//                // Create socket securely
+//                val socket = device.createRfcommSocketToServiceRecord(APP_UUID)
+//
+//                socket.connect()
+//
+//                val outputStream: OutputStream = socket.outputStream
+//                val inputStream = file.inputStream()
+//
+//                val buffer = ByteArray(1024)
+//                var bytesRead: Int
+//
+//                while (inputStream.read(buffer).also { bytesRead = it } != -1) {
+//                    outputStream.write(buffer, 0, bytesRead)
+//                }
+//
+//                outputStream.flush()
+//                inputStream.close()
+//                socket.close()
+//
+//                onComplete(true, null)
+//
+//            } catch (e: Exception) {
+//                Log.e("BluetoothClient", "Error sending file", e)
+//                onComplete(false, e.message)
+//            }
+//        }
+//    }
 
 }
 
