@@ -34,13 +34,8 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-        /**
-         * As of now, we only have this button for our whole functionality.
-         * Might need to have a separate one for LAN based sending
-         *
-         * TODO: Settings Button (?), Send via LAN?
-         * TODO (minor): Change fileSenderButton to bluetoothSenderButton, create localSenderButton for LAN
-         */
+
+
 
         // Start animated gradient background
         val layout = findViewById<ConstraintLayout>(R.id.main)
@@ -50,14 +45,17 @@ class MainActivity : AppCompatActivity() {
         val fileSenderButton = findViewById<Button>(R.id.SelectFileBTN)
 
         fileSenderButton.setOnClickListener {
-            // Launch FileSender activity
             val intent = Intent(this, FileSender::class.java)
+            intent.putExtra("AUTO_LOAD_FILES", true)
             startActivity(intent)
         }
+
 
         // Metallic gradient text effect
         applyMetallicShader()
     }
+
+
 
     private fun animateBackgroundLoop() {
         val handler = Handler(Looper.getMainLooper())
@@ -76,6 +74,8 @@ class MainActivity : AppCompatActivity() {
 
         handler.post(loopRunnable)
     }
+
+
 
     private fun applyMetallicShader() {
         val textView = findViewById<TextView>(R.id.appheaderTV)

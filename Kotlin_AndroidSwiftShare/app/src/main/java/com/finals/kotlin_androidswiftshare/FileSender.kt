@@ -8,9 +8,6 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import android.webkit.MimeTypeMap
 import android.os.Looper
 import android.provider.MediaStore
 import android.util.Log
@@ -18,9 +15,9 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import java.io.File
@@ -37,6 +34,9 @@ class FileSender : AppCompatActivity() {
     private val bluetoothDevices = mutableListOf<BluetoothDevice>()
     private var selectedFile: File? = null
 
+    /**
+     * PERMISSION HANDLERS FOR BLUETOOTH + FILE ACCESS
+     */
     private val requestBluetoothPermissions = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
@@ -57,11 +57,50 @@ class FileSender : AppCompatActivity() {
         }
     }
 
+    private val filePickerLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK) {
+            val dataUri = result.data?.data
+            if (dataUri != null) {
+                val fileName = getFileNameFromUri(dataUri)
+                val file = createLocalCopyFromUri(dataUri, fileName)
+                if (file != null) {
+                    fileList.add(0, file)
+                    selectedFile = file
+                    previewTextView.text = "Preview: ${file.name}"
+                    deviceRecyclerView.adapter?.notifyItemInserted(0)
+                    deviceRecyclerView.scrollToPosition(0)
+                    Toast.makeText(this, "File selected: ${file.name}", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    private fun getFileNameFromUri(uri: Uri): String {
+        var name = "selected_file"
+        val cursor = contentResolver.query(uri, null, null, null, null)
+        cursor?.use {
+            val nameIndex = cursor.getColumnIndex(MediaStore.Files.FileColumns.DISPLAY_NAME)
+            if (cursor.moveToFirst() && nameIndex != -1) {
+                name = cursor.getString(nameIndex)
+            }
+        }
+        return name
+    }
+
+
+    /**
+     * CLEANUP BLUETOOTH RESOURCES ON EXIT
+     */
     override fun onDestroy() {
         super.onDestroy()
         bluetoothManager.cleanup()
     }
 
+    /**
+     * ON CREATE — Main logic and initialization
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_file_sender)
@@ -69,8 +108,8 @@ class FileSender : AppCompatActivity() {
         deviceRecyclerView = findViewById(R.id.deviceRecyclerView)
         previewTextView = findViewById(R.id.filePreview)
         val bluetoothSendFileButton = findViewById<Button>(R.id.SendFileBTN)
-        val lanSendFileButton = findViewById<Button>(R.id.SendFileLanBTN)
 
+        // SETUP RECYCLERVIEW FOR FILE LISTING
         deviceRecyclerView.layoutManager = LinearLayoutManager(this)
         val fileAdapter = FileAdapter(fileList) { selected ->
             previewTextView.text = "Preview: ${selected.name}"
@@ -78,8 +117,23 @@ class FileSender : AppCompatActivity() {
         }
         deviceRecyclerView.adapter = fileAdapter
 
+        // INITIALIZE BLUETOOTH LOGIC
         bluetoothManager = BluetoothManager(this)
-        bluetoothDeviceAdapter = BluetoothDeviceAdapter(bluetoothDevices)
+        bluetoothDeviceAdapter = BluetoothDeviceAdapter(bluetoothDevices) { device ->
+            selectedFile?.let { file ->
+                val fileUri = Uri.fromFile(file)
+                bluetoothManager.sendFileToDevice(device, fileUri, ::onBluetoothSendComplete)
+            } ?: Toast.makeText(this, "No file selected to send.", Toast.LENGTH_SHORT).show()
+        }
+
+        val selectFileButton = findViewById<Button>(R.id.SelectFileBTN2)
+        selectFileButton.setOnClickListener {
+            val intent = Intent(Intent.ACTION_GET_CONTENT)
+            intent.type = "*/*" // You can limit this to "application/pdf" etc.
+            intent.addCategory(Intent.CATEGORY_OPENABLE)
+            filePickerLauncher.launch(intent)
+        }
+
 
         bluetoothManager.onDeviceDiscovered = { device ->
             runOnUiThread {
@@ -100,6 +154,7 @@ class FileSender : AppCompatActivity() {
             runOnUiThread { showBluetoothDevicesPopup() }
         }
 
+        // SEND FILE VIA BLUETOOTH BUTTON
         bluetoothSendFileButton.setOnClickListener {
             if (selectedFile == null) {
                 Toast.makeText(this, "Please select a file first.", Toast.LENGTH_SHORT).show()
@@ -108,54 +163,50 @@ class FileSender : AppCompatActivity() {
 
             bluetoothDevices.clear()
             bluetoothDeviceAdapter.notifyDataSetChanged()
+
             startBluetoothDiscovery()
-            android.os.Handler(Looper.getMainLooper()).postDelayed({ showBluetoothDevicesPopup() }, 2000)
         }
 
-        lanSendFileButton.setOnClickListener {
-            if (selectedFile == null) {
-                Toast.makeText(this, "Please select a file first.", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
 
-            val lanManager = LanManager(this)
-            val connectivityManager = getSystemService(CONNECTIVITY_SERVICE) as android.net.ConnectivityManager
-            val network = connectivityManager.activeNetwork
-            val capabilities = connectivityManager.getNetworkCapabilities(network)
-            val isConnectedToLAN = capabilities?.hasTransport(android.net.NetworkCapabilities.TRANSPORT_WIFI) == true
-
-            if (isConnectedToLAN) {
-                Toast.makeText(this, "Connected to LAN. Sending file...", Toast.LENGTH_SHORT).show()
-
-                lanManager.startServer { fileName, content ->
-                    runOnUiThread {
-                        Toast.makeText(this, "Received: $fileName (${content.size} bytes)", Toast.LENGTH_SHORT).show()
-                    }
-                    val receivedFile = File(filesDir, fileName)
-                    receivedFile.writeBytes(content)
-                }
-
-                lanManager.sendFileTo("192.168.1.5", selectedFile!!)
-            } else {
-                Toast.makeText(this, "Not connected to LAN.", Toast.LENGTH_LONG).show()
-            }
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            permissionLauncher.launch(
-                arrayOf(
-                    Manifest.permission.READ_MEDIA_IMAGES,
-                    Manifest.permission.READ_MEDIA_VIDEO,
-                    Manifest.permission.READ_EXTERNAL_STORAGE
+        /**
+         * AUTO-TRIGGER FILE LOAD IF INTENT EXTRA IS SET
+         */
+        val autoLoadFiles = intent.getBooleanExtra("AUTO_LOAD_FILES", false)
+        if (autoLoadFiles) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                permissionLauncher.launch(
+                    arrayOf(
+                        Manifest.permission.READ_MEDIA_IMAGES,
+                        Manifest.permission.READ_MEDIA_VIDEO,
+                        Manifest.permission.READ_EXTERNAL_STORAGE
+                    )
                 )
-            )
-        } else {
-            permissionLauncher.launch(
-                arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
-            )
+            } else {
+                permissionLauncher.launch(
+                    arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
+                )
+            }
         }
     }
 
+    /**
+     * CALLBACK FOR BLUETOOTH FILE TRANSFER STATUS
+     */
+    private fun onBluetoothSendComplete(success: Boolean, error: String?) {
+        val message = if (success) {
+            "File sent successfully!"
+        } else {
+            "Failed to send file: ${error ?: "Unknown error"}"
+        }
+
+        runOnUiThread {
+            Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+        }
+    }
+
+    /**
+     * LOAD FILES FROM DEVICE MEDIASTORE
+     */
     private fun loadFilesFromMediaStore() {
         val projection = arrayOf(
             MediaStore.Files.FileColumns._ID,
@@ -174,8 +225,6 @@ class FileSender : AppCompatActivity() {
             "text/plain",
             "application/msword",
             "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-            "application/vnd.ms-excel",
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
 
         val cursor = contentResolver.query(uri, projection, selection, selectionArgs, sortOrder)
@@ -205,6 +254,9 @@ class FileSender : AppCompatActivity() {
         deviceRecyclerView.adapter?.notifyDataSetChanged()
     }
 
+    /**
+     * CONVERT URI TO LOCAL FILE COPY
+     */
     private fun createLocalCopyFromUri(uri: Uri, fileName: String): File? {
         return try {
             val file = File(cacheDir, fileName)
@@ -220,6 +272,9 @@ class FileSender : AppCompatActivity() {
         }
     }
 
+    /**
+     * DISPLAY POPUP OF DISCOVERED BLUETOOTH DEVICES
+     */
     private fun showBluetoothDevicesPopup() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_bluetooth_devices, null)
         val recyclerView = dialogView.findViewById<RecyclerView>(R.id.deviceRecyclerView)
@@ -235,6 +290,9 @@ class FileSender : AppCompatActivity() {
         dialog.show()
     }
 
+    /**
+     * HANDLE BLUETOOTH DEVICE DISCOVERY & PERMISSIONS
+     */
     private fun startBluetoothDiscovery() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED ||

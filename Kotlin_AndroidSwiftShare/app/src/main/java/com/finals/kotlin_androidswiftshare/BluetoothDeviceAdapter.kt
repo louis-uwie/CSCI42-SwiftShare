@@ -10,33 +10,44 @@ import androidx.annotation.RequiresPermission
 import androidx.recyclerview.widget.RecyclerView
 
 class BluetoothDeviceAdapter(
-    private val devices: List<BluetoothDevice>, // LIST OF BLUETOOTH DEVICES TO DISPLAY
-    private val onDeviceClick: (BluetoothDevice) -> Unit // CALLBACK WHEN A DEVICE IS CLICKED
+    private val devices: List<BluetoothDevice>,
+    private val onDeviceClick: (BluetoothDevice) -> Unit
 ) : RecyclerView.Adapter<BluetoothDeviceAdapter.DeviceViewHolder>() {
 
-    // HOLDER CLASS FOR EACH DEVICE ROW
+    private var selectedPosition = RecyclerView.NO_POSITION
+
     inner class DeviceViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val deviceNameTextView: TextView = itemView.findViewById(android.R.id.text1)
-    }
+        val textView: TextView = itemView.findViewById(R.id.deviceItemText)
+        val rowLayout: View = itemView.findViewById(R.id.deviceRowLayout)
 
-    // CREATE VIEW HOLDER FOR DEVICE ROW
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DeviceViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(android.R.layout.simple_list_item_1, parent, false)
-        return DeviceViewHolder(view)
-    }
-
-    // BIND DEVICE TO TEXTVIEW AND SET CLICK ACTION
-    @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
-    override fun onBindViewHolder(holder: DeviceViewHolder, position: Int) {
-        val device = devices[position]
-        val displayName = device.name ?: device.address ?: "Unknown Device"
-        holder.deviceNameTextView.text = displayName
-        holder.itemView.setOnClickListener {
-            onDeviceClick(device)
+        init {
+            itemView.setOnClickListener {
+                val previous = selectedPosition
+                selectedPosition = adapterPosition
+                notifyItemChanged(previous)
+                notifyItemChanged(selectedPosition)
+                onDeviceClick(devices[adapterPosition])
+            }
         }
     }
 
-    // RETURN TOTAL DEVICE COUNT
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DeviceViewHolder {
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_bluetooth_device_selectable, parent, false)
+        return DeviceViewHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: DeviceViewHolder, position: Int) {
+        val device = devices[position]
+        val name = device.name ?: device.address ?: "Unknown Device"
+        holder.textView.text = name
+
+        if (position == selectedPosition) {
+            holder.rowLayout.setBackgroundColor(0xFFB2EBF2.toInt()) // Highlight selected
+        } else {
+            holder.rowLayout.setBackgroundColor(0x00000000) // Transparent for others
+        }
+    }
+
     override fun getItemCount(): Int = devices.size
 }

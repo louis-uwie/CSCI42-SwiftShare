@@ -29,6 +29,8 @@ class BluetoothManager(private val context: Context) {
     var onDeviceDiscovered: ((BluetoothDevice) -> Unit)? = null
     var onDiscoveryFinished: (() -> Unit)? = null
 
+
+
     /**
      * Handles events for discovering new Bluetooth devices and when discovery ends.
      */
@@ -58,11 +60,15 @@ class BluetoothManager(private val context: Context) {
         }
     }
 
+
+
     init {
         val filter = IntentFilter(BluetoothDevice.ACTION_FOUND)
         filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED)
         context.registerReceiver(discoveryReceiver, filter)
     }
+
+
 
     /**
      * Begins Bluetooth device discovery. Stops any ongoing scan first.
@@ -76,6 +82,8 @@ class BluetoothManager(private val context: Context) {
         }
     }
 
+
+
     /**
      * Stops current Bluetooth discovery if active.
      */
@@ -84,6 +92,8 @@ class BluetoothManager(private val context: Context) {
         bluetoothAdapter?.cancelDiscovery()
     }
 
+
+
     /**
      * Starts pairing with the given device.
      */
@@ -91,6 +101,8 @@ class BluetoothManager(private val context: Context) {
     fun pairDevice(device: BluetoothDevice) {
         device.createBond()
     }
+
+
 
     /**
      * Makes the current device discoverable to others for the specified number of seconds.
@@ -102,12 +114,16 @@ class BluetoothManager(private val context: Context) {
         context.startActivity(discoverableIntent)
     }
 
+
+
     /**
      * Unregisters discovery broadcast receiver. Call during cleanup (e.g., onDestroy).
      */
     fun cleanup() {
         context.unregisterReceiver(discoveryReceiver)
     }
+
+
 
     /**
      * Checks and requests Bluetooth-related permissions if not already granted.
@@ -129,6 +145,8 @@ class BluetoothManager(private val context: Context) {
         }
     }
 
+
+
     /**
      * Sends a file (via content URI) to a paired Bluetooth device.
      * Automatically opens a socket, streams file content, and closes the connection.
@@ -137,6 +155,7 @@ class BluetoothManager(private val context: Context) {
      * @param fileUri URI to the file selected via content picker or file explorer.
      * @param onComplete Callback for success/failure.
      */
+
     private val APP_UUID: UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB")
 
     @SuppressLint("MissingPermission")
@@ -178,6 +197,7 @@ class BluetoothManager(private val context: Context) {
             }
         }
     }
+
 
     /**
      * Sends a file (via File object) to a paired Bluetooth device.
