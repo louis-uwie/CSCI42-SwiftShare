@@ -22,7 +22,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import java.io.File
 import java.io.FileOutputStream
-import java.io.InputStream
 
 class FileSender : AppCompatActivity() {
 
@@ -30,6 +29,7 @@ class FileSender : AppCompatActivity() {
     private lateinit var bluetoothManager: BluetoothManager
     private lateinit var bluetoothDeviceAdapter: BluetoothDeviceAdapter
     private lateinit var deviceRecyclerView: RecyclerView
+
     private val bluetoothDevices = mutableListOf<BluetoothDevice>()
     private var selectedFile: File? = null
     private var discoveryHandler: Handler? = null
@@ -44,7 +44,7 @@ class FileSender : AppCompatActivity() {
             val fileName = uri.lastPathSegment?.substringAfterLast('/') ?: "document"
             val file = createLocalCopyFromUri(uri, fileName)
             if (file != null) {
-                previewTextView.text = "Preview: ${file.name}"
+                previewTextView.text = "Preview: ${fileName}"
                 selectedFile = file
             }
         }
@@ -79,10 +79,16 @@ class FileSender : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_file_sender)
+        val selectFileButton = findViewById<Button>(R.id.SelectFileBTN2)
+        selectFileButton.setOnClickListener {
+            // OPEN FILE PICKER AGAIN TO SELECT A NEW FILE
+            filePickerLauncher.launch(arrayOf("application/pdf", "image/jpeg", "image/png", "text/plain"))
+        }
+
 
         previewTextView = findViewById(R.id.filePreview)
         val bluetoothSendFileButton = findViewById<Button>(R.id.SendFileBTN)
-        val SelectFileButton = findViewById<Button>(R.id.SelectFileBTN2)
+//        val lanSendFileButton = findViewById<Button>(R.id.SendFileLanBTN)
         deviceRecyclerView = findViewById(R.id.deviceRecyclerView)
         deviceRecyclerView.layoutManager = LinearLayoutManager(this)
 
@@ -128,7 +134,6 @@ class FileSender : AppCompatActivity() {
             bluetoothDeviceAdapter.notifyDataSetChanged()
             startBluetoothDiscoveryLoop()
         }
-
 
         // OPEN FILE PICKER
         filePickerLauncher.launch(arrayOf("application/pdf", "image/jpeg", "image/png", "text/plain"))
@@ -229,3 +234,4 @@ class FileSender : AppCompatActivity() {
         }
     }
 }
+
