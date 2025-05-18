@@ -10,7 +10,10 @@ import android.os.Handler
 import android.os.Looper
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.ViewCompat
@@ -20,6 +23,8 @@ class MainActivity : AppCompatActivity() {
 
     private var isReversed = false
     private lateinit var transitionDrawable: TransitionDrawable
+    private lateinit var bluetoothPermissionLauncher: ActivityResultLauncher<Array<String>>
+
 
     /**
      * ON CREATE-- Most things initialize here.
@@ -36,6 +41,22 @@ class MainActivity : AppCompatActivity() {
         }
 
 
+        // Request Permission
+        bluetoothPermissionLauncher = registerForActivityResult(
+            ActivityResultContracts.RequestMultiplePermissions()
+        ) { permissions ->
+            val allGranted = permissions.values.all { it }
+            if (!allGranted) {
+                Toast.makeText(this, "Bluetooth permissions not fully granted.", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+
+        // Request permissions on launch
+        val bluetoothManager = BluetoothManager(this)
+        bluetoothManager.requestBluetoothPermissions(bluetoothPermissionLauncher)
+
+
 
         // Start animated gradient background
         val layout = findViewById<ConstraintLayout>(R.id.main)
@@ -49,7 +70,6 @@ class MainActivity : AppCompatActivity() {
             intent.putExtra("AUTO_LOAD_FILES", true)
             startActivity(intent)
         }
-
 
         // Metallic gradient text effect
         applyMetallicShader()
@@ -71,7 +91,6 @@ class MainActivity : AppCompatActivity() {
                 handler.postDelayed(this, 6000) // 3s for transition, 3s pause
             }
         }
-
         handler.post(loopRunnable)
     }
 
@@ -99,4 +118,4 @@ class MainActivity : AppCompatActivity() {
             textView.invalidate()
         }
     }
-    }
+}
