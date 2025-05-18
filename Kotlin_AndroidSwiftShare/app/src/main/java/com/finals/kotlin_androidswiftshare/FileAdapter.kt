@@ -8,8 +8,8 @@ import androidx.recyclerview.widget.RecyclerView
 import java.io.File
 
 class FileAdapter(
-    private val files: List<File>, // LIST OF FILE OBJECTS TO BE DISPLAYED
-    private val onFileClick: (File) -> Unit // CALLBACK FUNCTION WHEN A FILE IS CLICKED
+    private val files: List<File>,              // LIST OF FILE OBJECTS TO BE DISPLAYED
+    private val onFileClick: (File) -> Unit     // CALLBACK FUNCTION WHEN A FILE IS CLICKED
 ) : RecyclerView.Adapter<FileAdapter.FileViewHolder>() {
 
     /**

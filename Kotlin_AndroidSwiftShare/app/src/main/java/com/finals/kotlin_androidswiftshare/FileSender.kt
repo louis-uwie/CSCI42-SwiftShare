@@ -15,6 +15,7 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresPermission
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.FileProvider
@@ -243,6 +244,7 @@ class FileSender : AppCompatActivity() {
     /**
      * USES SYSTEM BLUETOOTH INTENT TO SEND FILE TO DEVICE
      */
+    @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
     private fun sendFileToDevice(device: BluetoothDevice) {
         if (selectedFile == null) {
             Toast.makeText(this, "No file selected to send.", Toast.LENGTH_SHORT).show()
