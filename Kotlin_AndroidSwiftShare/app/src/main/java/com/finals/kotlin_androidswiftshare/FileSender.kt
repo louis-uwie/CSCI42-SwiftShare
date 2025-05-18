@@ -119,12 +119,14 @@ class FileSender : AppCompatActivity() {
 
         // INITIALIZE BLUETOOTH LOGIC
         bluetoothManager = BluetoothManager(this)
+
         bluetoothDeviceAdapter = BluetoothDeviceAdapter(bluetoothManager.getDiscoveredDevices()) { device ->
             selectedFile?.let { file ->
                 val fileUri = Uri.fromFile(file)
                 bluetoothManager.sendFileToDevice(device, fileUri, ::onBluetoothSendComplete)
             } ?: Toast.makeText(this, "No file selected to send.", Toast.LENGTH_SHORT).show()
         }
+
 
 
         val selectFileButton = findViewById<Button>(R.id.SelectFileBTN2)
@@ -272,15 +274,8 @@ class FileSender : AppCompatActivity() {
     private fun showBluetoothDevicesPopup() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_bluetooth_devices, null)
         val recyclerView = dialogView.findViewById<RecyclerView>(R.id.deviceRecyclerView)
-        recyclerView.layoutManager = LinearLayoutManager(this)
 
-        // Always get updated list from manager
-        bluetoothDeviceAdapter = BluetoothDeviceAdapter(bluetoothManager.getDiscoveredDevices()) { device ->
-            selectedFile?.let { file ->
-                val fileUri = Uri.fromFile(file)
-                bluetoothManager.sendFileToDevice(device, fileUri, ::onBluetoothSendComplete)
-            } ?: Toast.makeText(this, "No file selected to send.", Toast.LENGTH_SHORT).show()
-        }
+        recyclerView.layoutManager = LinearLayoutManager(this)
 
         recyclerView.adapter = bluetoothDeviceAdapter
 
